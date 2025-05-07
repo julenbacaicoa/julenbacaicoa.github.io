@@ -1,4 +1,75 @@
 ---
 layout: home
+title: "Science, Code & Curiosity"
+permalink: /
+header:
+  overlay_image: /assets/images/home2.jpg
+  overlay_filter: 0.2
 author_profile: true
 ---
+
+<div class="welcome-box">
+  <h2>👋 Hi and welcome — I'm Julen Bacaicoa</h2>
+  <p id="welcome-msg" style="font-size: 0.75rem; line-height: 1.8;">
+    Welcome to my personal corner on the web — a space where curiosity meets engineering. Here you'll find a curated mix of research, teaching, and code projects that reflect my passion for understanding how things move, connect, and evolve.
+  </p>
+</div>
+
+<div class="quick-links-grid fixed-layout">
+    <a href="/projects/" class="quick-link-card">
+      <div class="icon">🚀</div>
+      <h4>Projects</h4>
+      <p>Explore hands-on work and technical challenges I’ve tackled.</p>
+    </a>
+    <a href="/papers/" class="quick-link-card">
+      <div class="icon">📄</div>
+      <h4>Papers</h4>
+      <p>Browse academic publications and research findings.</p>
+    </a>
+    <a href="/teaching/" class="quick-link-card">
+      <div class="icon">🎓</div>
+      <h4>Teaching</h4>
+      <p>Discover the courses I teach and topics I cover in class.</p>
+    </a>
+    <a href="/talks/" class="quick-link-card">
+      <div class="icon">🎤</div>
+      <h4>Talks</h4>
+      <p>Highlights from conferences, lectures, and invited talks.</p>
+    </a>
+    <a href="/blog/" class="quick-link-card">
+      <div class="icon">🧠</div>
+      <h4>Blog</h4>
+      <p>Short thoughts, tutorials, and deep dives on tech and science.</p>
+    </a>
+    <a href="/about/" class="quick-link-card">
+      <div class="icon">👨‍💻</div>
+      <h4>About Me</h4>
+      <p>Get to know my background, interests, and what drives me.</p>
+    </a>
+  </div>
+
+<script>
+  const messages = [
+    "Welcome to my personal corner on the web — a space where curiosity meets engineering. Here you'll find a curated mix of research, teaching, and code projects that reflect my passion for understanding how things move, connect, and evolve.",
+    
+    "This portfolio is more than just a collection of achievements. It's a playground of ideas, experiments, and shared learning. Whether you're a fellow researcher, a student, or just curious — I'm glad you're here. Dive in and explore!",
+
+    "Science, code, and curiosity — these are the three pillars that guide my work. I believe in asking bold questions, building things from scratch, and turning complexity into something meaningful and beautiful.",
+
+    "Feel free to look around, check out the papers and projects, or read some thoughts I've shared in blog posts. And if something catches your eye, don’t hesitate to reach out — I’m always open to exchanging ideas.",
+
+    "Thanks for visiting! I hope this space sparks inspiration, invites you to learn something new, or just gives you a glimpse into the kind of work that excites me most. Let the exploration begin."
+  ];
+
+  let i = 1;
+  const msg = document.getElementById("welcome-msg");
+
+  setInterval(() => {
+    msg.classList.add("welcome-fade-out");
+    setTimeout(() => {
+      msg.textContent = messages[i];
+      msg.classList.remove("welcome-fade-out");
+      i = (i + 1) % messages.length;
+    }, 500);
+  }, 10000); // más tiempo para leer
+</script>

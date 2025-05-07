@@ -1,0 +1,39 @@
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+  }
+  
+  .project-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .project-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .project-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  
+  .project-card h3 {
+    margin: 1rem 0 0.5rem;
+    font-size: 1.2rem;
+    color: #333;
+  }
+  
+  .project-card p {
+    padding: 0 1rem 1.5rem;
+    color: #555;
+    font-size: 0.95rem;
+  }
+  

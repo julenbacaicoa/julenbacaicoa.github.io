@@ -12,16 +12,16 @@
 
 # theme                  : "minimal-mistakes-jekyll"
 # remote_theme           : "mmistakes/minimal-mistakes"
-minimal_mistakes_skin    : "default" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
+minimal_mistakes_skin    : "mint" # "default", "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
 locale                   : "en-US"
 rtl                      : # true, false (default) # turns direction of the page into right to left for RTL languages
-title                    : "Site Title"
+title                    : "Science, Code & Curiosity"
 title_separator          : "-"
-subtitle                 : # site tagline that appears below site title in masthead
-name                     : "Your Name"
-description              : "An amazing website."
+subtitle                 : Shaped by science. Powered by code. Driven by curiosity. # site tagline that appears below site title in masthead
+name                     : "Julen Bacaicoa"
+description              : "Exploring the frontiers of applied mechanics."
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -113,18 +113,24 @@ analytics:
 
 # Site Author
 author:
-  name             : "Your Name"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "I am an **amazing** person."
-  location         : "Somewhere"
+  name             : "Julen Bacaicoa"
+  avatar           : "/assets/images/bio-photo.jpg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  bio              : "Exploring the frontiers of mechanics through data, code, and curiosity."
+  location         : "Pamplona/Iruña, Spain"
   email            :
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:your.name@email.com"
-    - label: "Website"
+      url: "mailto:julen.bacaicoa@unavarra.es"
+    - label: "ORCID"
       icon: "fas fa-fw fa-link"
-      # url: "https://your-website.com"
+      url: "https://orcid.org/0000-0001-9993-4855"
+    - label: "Web of Science"
+      icon: "fas fa-fw fa-link"
+      url: "https://www.webofscience.com/wos/author/record/AAQ-1025-2021"
+    - label: "UPNA Website"
+      icon: "fas fa-fw fa-link"
+      url: "https://www.unavarra.es/pdi?uid=811691"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
       # url: "https://twitter.com/"
@@ -133,7 +139,7 @@ author:
       # url: "https://facebook.com/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      # url: "https://github.com/"
+      url: "https://github.com/julenbacaicoa/"
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
       # url: "https://instagram.com/"
@@ -149,7 +155,7 @@ footer:
       # url:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      # url:
+      url: "https://github.com/julenbacaicoa/"
     - label: "GitLab"
       icon: "fab fa-fw fa-gitlab"
       # url:
@@ -324,3 +330,11 @@ defaults:
       comments: # true
       share: true
       related: true
+      mathjax: true
+
+# MathJax + LaTeX support
+kramdown:
+  input: GFM
+  math_engine: mathjax
+  syntax_highlighter_opts:
+    disable : true

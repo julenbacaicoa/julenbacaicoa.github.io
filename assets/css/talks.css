@@ -1,0 +1,54 @@
+.talks-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    padding: 1rem 0;
+  }
+  
+  .talk-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 5px solid #30e3ca;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease;
+  }
+  
+  .talk-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .talk-header h3 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+    color: #222;
+  }
+  
+  .talk-meta {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.5;
+  }
+  
+  .talk-link {
+    margin-top: 10px;
+  }
+  
+  .talk-link a {
+    text-decoration: none;
+    color: #007acc;
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+  
+  /* Highlight type like "Keynote", "Invited Talk" */
+  .talk-type {
+    background-color: #ffd700;
+    color: #000;
+    font-size: 0.7rem;
+    padding: 3px 6px;
+    border-radius: 5px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  

@@ -1,0 +1,44 @@
+.teaching-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    padding: 1rem 0;
+  }
+  
+  .teaching-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+  }
+  
+  .teaching-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .teaching-card h3 {
+    margin-top: 0;
+    color: #5000ca;
+  }
+  
+  .teaching-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #eee;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+  
+  .course-description {
+    background-color: #f9f9f9;
+    border-left: 4px solid #30e3ca;
+    padding: 10px 15px;
+    margin-top: 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #444;
+  }
+  
