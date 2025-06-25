@@ -1,27 +1,30 @@
 const projects = [
     {
-      title: "Smart Predictive Maintenance",
-      image: "/assets/images/projects/blank-image.jpg",
-      description: "Machine learning-driven system to predict mechanical failures in industrial environments.",
-      link: "/projects/smart-maintenance"
+      title: "VisuTrace",
+      image: "/assets/images/projects/visutrace.png",
+      description: "Visual tool for analyzing industrial robot trajectories and joint dynamics.",
+      link: "/projects/visutrace",
+      class: "big-image"  // 👈 IMAGEN MÁS GRANDE
     },
     {
-      title: "Digital Twin for Vehicle Dynamics",
-      image: "/assets/images/projects/blank-image.jpg",
-      description: "Simulation model of a vehicle's dynamic behavior for control algorithm development.",
-      link: "/projects/digital-twin"
+      title: "SolBeam2D",
+      image: "/assets/images/projects/solbeam2d.png",
+      description: "Interactive tool for modeling and analyzing 2D beam structures with real-time visual feedback.",
+      link: "/projects/solbeam2d",
+      class: "big-image"  // 👈 IMAGEN MÁS GRANDE
     },
     {
-      title: "Robotic Arm Vibration Analysis",
-      image: "/assets/images/projects/blank-image.jpg",
-      description: "Experimental modal analysis and real-time damping control for robotic manipulators.",
-      link: "/projects/robotic-arm"
+      title: "VibraSim",
+      image: "/assets/images/projects/vibrasim.png",
+      description: "Interactive simulator for vibration analysis — under active development.",
+      link: "/projects/vibrasim",
+      class: "big-image"  // 👈 IMAGEN MÁS GRANDE
     }
   ];
   
   function createProjectCard(project) {
     return `
-      <div class="project-card" onclick="location.href='${project.link}'">
+      <div class="project-card ${project.class || ''}" onclick="location.href='${project.link}'">
         <img src="${project.image}" alt="${project.title}">
         <h3>${project.title}</h3>
         <p>${project.description}</p>

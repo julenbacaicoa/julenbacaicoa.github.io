@@ -43,8 +43,8 @@ const courses = [
       <div class="teaching-card">
         <span class="teaching-badge" style="background-color:${badgeColor}">${course.type}</span>
         <h3>${course.title}</h3>
-        <p><strong>Program:</strong> ${course.degree}</p>
-        <p><strong>Years:</strong> ${course.years}</p>
+        <p>🎓 ${course.degree}</p>
+        <p>📅 ${course.years}</p>
         <div class="course-description">${course.description}</div>
       </div>
     `;
@@ -52,7 +52,7 @@ const courses = [
   
   const container = document.getElementById('teaching-container');
   container.innerHTML = `
-    <h2 style="text-align:center">🧑‍🏫 Teaching Experience</h2>
+    <h2 style="text-align:center">👨🏻‍🏫 Teaching Experience</h2>
     <div class="teaching-grid">
       ${courses.map(createCard).join('')}
     </div>

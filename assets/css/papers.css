@@ -1,89 +1,159 @@
+/* ─────────────────────────────────────────────
+   ENCABEZADOS Y CONTENIDO
+────────────────────────────────────────────── */
+
+/* Espaciado inferior reducido para H1 en la página */
 .page__content h1 {
-    margin-bottom: 0.5rem;
-  }
-  
-  #charts {
-    margin-top: 0;
-  }
-  
-  /* Container de los dos gráficos */
-  .charts-flex {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    margin: 1.5rem 0;
-  }
-  
-  .charts-flex canvas {
-    width: 100%;
-    max-width: 400px;
-    height: auto !important;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-    padding: 1rem;
-  }
-  
-  .papers-grid {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    padding: 1rem 0;
-  }
-  
-  .paper-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    border-left: 5px solid #30e3ca;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-    transition: transform 0.2s ease;
-  }
-  
-  .paper-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .paper-title {
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin-bottom: 8px;
-  }
-  
-  .paper-meta {
-    font-size: 0.85rem;
-    color: #555;
-    margin-bottom: 8px;
-  }
-  
-  .paper-actions a {
-    font-size: 0.85rem;
-    color: #5000ca;
-    text-decoration: none;
-    margin-right: 10px;
-  }
-  
-  /* Quartile badge */
-  .quartile-badge {
-    background-color: #eee;
-    color: #333;
-    font-size: 0.7rem;
-    font-weight: bold;
-    padding: 3px 7px;
-    border-radius: 6px;
-    margin-left: 6px;
-  }
-  
-  /* Colores de borde según medalla */
-  .paper-card[data-award="gold"] {
-    border-left-color: gold;
-  }
-  .paper-card[data-award="silver"] {
-    border-left-color: silver;
-  }
-  .paper-card[data-award="bronze"] {
-    border-left-color: #cd7f32;
-  }
-  
+  margin-bottom: 0.5rem;
+}
+
+/* Ajuste de margen superior del contenedor de gráficos */
+#charts {
+  margin-top: 0;
+}
+
+/* ─────────────────────────────────────────────
+   ANCHO PERSONALIZADO PARA LA PÁGINA /papers/
+────────────────────────────────────────────── */
+
+/* ⚙️ Más ancho en el contenedor principal de la página "papers" */
+.page.papers .page__inner-wrap {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ─────────────────────────────────────────────
+   GRÁFICOS EN FLEX (usualmente canvas)
+────────────────────────────────────────────── */
+
+/* Contenedor flexible de dos gráficos (canvas) */
+.charts-flex {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* Estilo visual para cada gráfico (canvas) */
+.charts-flex canvas {
+  width: 100%;
+  max-width: 400px;
+  height: auto !important;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  padding: 1rem;
+}
+
+/* ─────────────────────────────────────────────
+   REJILLA DE PAPERS (cards)
+────────────────────────────────────────────── */
+
+/* Contenedor grid responsivo para tarjetas de publicaciones */
+.papers-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  padding: 1rem 0;
+}
+
+/* Estilo base para cada tarjeta de paper */
+.paper-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 5px solid #30e3ca;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+}
+
+/* Efecto hover con desplazamiento suave */
+.paper-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Título del paper */
+.paper-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+/* Metadatos del paper (revista, año, etc.) */
+.paper-meta {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+/* Enlaces de acción (PDF, DOI, etc.) */
+.paper-actions a {
+  font-size: 0.85rem;
+  color: #5000ca;
+  text-decoration: none;
+  margin-right: 10px;
+}
+
+/* ─────────────────────────────────────────────
+   BADGES Y DISTINCIONES
+────────────────────────────────────────────── */
+
+/* Estilo de insignia de cuartil (Q1, Q2...) */
+.quartile-badge {
+  background-color: #eee;
+  color: #333;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 3px 7px;
+  border-radius: 6px;
+  margin-left: 6px;
+}
+
+/* Cambiar color del borde izquierdo según el award */
+.paper-card[data-award="gold"] {
+  border-left-color: gold;
+}
+
+.paper-card[data-award="silver"] {
+  border-left-color: silver;
+}
+
+.paper-card[data-award="bronze"] {
+  border-left-color: #cd7f32;
+}
+
+/* ─────────────────────────────────────────────
+   BOTONES DE ACCIONES: DOI y PDF
+────────────────────────────────────────────── */
+
+/* Estilo base para los botones de acción */
+.paper-actions .paper-btn {
+  display: inline-flex;              /* Alineación horizontal de icono y texto */
+  align-items: center;              /* Centrado vertical */
+  gap: 0.4rem;                      /* Espacio entre ícono y texto (si se muestra) */
+  background-color: #f0f4ff;        /* Fondo suave */
+  color: #1a73e8;                   /* Azul para icono/texto */
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 20px;              /* Bordes redondeados tipo píldora */
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+/* Efecto hover para que parezca botón */
+.paper-actions .paper-btn:hover {
+  background-color: #e0efff;
+  border-color: #1a73e8;
+  text-decoration: none;
+  color: #174ea6;
+}
+
+/* Estilo para el ícono dentro del botón */
+.paper-actions .paper-btn i {
+  font-size: 1rem;
+}

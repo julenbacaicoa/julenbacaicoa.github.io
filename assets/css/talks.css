@@ -1,54 +1,136 @@
+/* ─────────────────────────────────────────────
+   CONTENEDOR GRID PARA LAS TARJETAS DE CHARLAS
+────────────────────────────────────────────── */
 .talks-grid {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    padding: 1rem 0;
-  }
-  
-  .talk-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    border-left: 5px solid #30e3ca;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-    transition: transform 0.2s ease;
-  }
-  
-  .talk-card:hover {
-    transform: translateY(-4px);
-  }
-  
-  .talk-header h3 {
-    margin: 0 0 10px;
-    font-size: 1.05rem;
-    color: #222;
-  }
-  
-  .talk-meta {
-    font-size: 0.85rem;
-    color: #555;
-    line-height: 1.5;
-  }
-  
-  .talk-link {
-    margin-top: 10px;
-  }
-  
-  .talk-link a {
-    text-decoration: none;
-    color: #007acc;
-    font-weight: bold;
-    font-size: 0.85rem;
-  }
-  
-  /* Highlight type like "Keynote", "Invited Talk" */
-  .talk-type {
-    background-color: #ffd700;
-    color: #000;
-    font-size: 0.7rem;
-    padding: 3px 6px;
-    border-radius: 5px;
-    margin-left: 8px;
-    vertical-align: middle;
-  }
-  
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  padding: 1rem 0;
+}
+
+/* ─────────────────────────────────────────────
+   TARJETA INDIVIDUAL DE CADA CHARLA
+────────────────────────────────────────────── */
+.talk-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 5px solid #30e3ca; /* Turquesa */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+}
+
+.talk-card:hover {
+  transform: translateY(-4px); /* Efecto hover sutil */
+}
+
+/* ─────────────────────────────────────────────
+   ENCABEZADO DE LA CHARLA (título + tipo)
+────────────────────────────────────────────── */
+.talk-header h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  color: #222;
+}
+
+/* ─────────────────────────────────────────────
+   METADATOS DE LA CHARLA (evento, lugar, año)
+────────────────────────────────────────────── */
+.talk-meta {
+  font-size: 0.85rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────
+   MODO DE PRESENTACIÓN: POSTER, ORAL, ETC.
+────────────────────────────────────────────── */
+.talk-mode {
+  font-size: 0.78rem;
+  margin-top: 6px;
+  color: #444;
+  font-style: italic;
+}
+
+
+/* ─────────────────────────────────────────────
+   BOTÓN DE ENLACE A MATERIAL DE LA CHARLA
+────────────────────────────────────────────── */
+.talk-link {
+  margin-top: 10px;
+}
+
+.talk-link a {
+  text-decoration: none;
+  color: #007acc;       /* Azul vivo */
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+/* ─────────────────────────────────────────────
+   INSIGNIA PARA EL TIPO DE CHARLA (ej: Keynote)
+────────────────────────────────────────────── */
+.talk-type {
+  background-color: #ffd700; /* Amarillo oro */
+  color: #000;
+  font-size: 0.7rem;
+  padding: 3px 6px;
+  border-radius: 5px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* ─────────────────────────────────────────────
+   Botón de enlace para Talks
+────────────────────────────────────────────── */
+.talk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background-color: #f0f4ff;
+  color: #30e3ca;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 20px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.1s ease;
+}
+
+.talk-btn:hover {
+  background-color: #e0efff;
+  border-color: #1a73e8;
+  color: #174ea6;
+  text-decoration: none;
+}
+
+.talk-btn i {
+  font-size: 1rem;
+}
+
+/* ─────────────────────────────────────────────
+   GRÁFICOS EN FLEX (usualmente canvas)
+────────────────────────────────────────────── */
+
+/* Contenedor flexible de dos gráficos (canvas) */
+.charts-flex {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;           /* Alineación superior para gráficos */
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* Estilo visual para cada gráfico (canvas) */
+.charts-flex canvas {
+  width: 100%;
+  max-width: 400px;                 /* Misma anchura que en papers */
+  height: auto !important;          /* Mantener proporciones automáticas */
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  padding: 1rem;
+}
+

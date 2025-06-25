@@ -1,281 +1,354 @@
+/* ─────────────────────────────────────────────
+   TIMELINE (línea de tiempo vertical)
+────────────────────────────────────────────── */
 .timeline {
-    position: relative;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-  
-  .timeline::after {
-    content: '';
-    position: absolute;
-    width: 6px;
-    background-color: #ccc;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    margin-left: -3px;
-  }
-  
-  .container {
-    padding: 10px 40px;
-    position: relative;
-    width: 50%;
-  }
-  
-  .container.left {
-    left: 0;
-  }
-  
-  .container.right {
-    left: 50%;
-  }
-  
-  .container::before {
-    content: '';
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    top: 20px;
-    background-color: #6200ea;
-    border: 4px solid white;
-    border-radius: 50%;
-    z-index: 1;
-  }
-  
-  .container.left::before {
-    right: -12px; /* Punto a la derecha */
-  }
-  
-  .container.right::before {
-    left: -12px; /* Punto a la izquierda */
-  }
-  
-  .content {
-    padding: 20px;
-    background-color: white;
-    position: relative;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Forzar mayor ancho en páginas con layout: single */
-  .layout--single .page__inner-wrap {
-    max-width: 1200px !important;
-    width: 150% !important;
-    margin: 0 auto !important;
-    padding: 0 2rem !important;
-    box-sizing: border-box;
-    transform: translateX(-50px); /* Ajusta este valor según lo veas */
-  }
-  
-  .layout--single .page__content {
-    width: 100% !important;
-  }
-  
-  /* 🔧 Fuerza el ancho total en la página de inicio */
-  .layout--home .page {
-    max-width: 1400px !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-    padding: 0 2rem !important;
-    box-sizing: border-box;
-  }
-  
-  /* 🔧 Opcional: ajusta solo la caja del mensaje de bienvenida si lo necesitas */
-  .home-welcome-box {
-    max-width: 100%;
-    margin-bottom: 2rem;
-  }
-  
-  /* 🎨 Estilo para el bloque de bienvenida */
-  .welcome-box {
-    background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
-    border-left: 6px solid #30e3ca;
-    border-radius: 12px;
-    padding: 1.8rem 2.2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-    font-family: 'Open Sans', sans-serif;
-    animation: fadeIn 1s ease-out;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .welcome-box::before {
-    content: "✨";
-    position: absolute;
-    top: 16px;
-    right: 20px;
-    font-size: 1.6rem;
-    opacity: 0.4;
-  }
-  
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .welcome-box h2 {
-    font-size: 1rem;
-    margin-bottom: 0.6rem;
-    color: #2c3e50;
-  }
-  
-  .welcome-box p {
-    font-size: 0.75rem;
-    line-height: 1.7;
-    color: #34495e;
-  }
-  
-  #welcome-msg {
-    transition: opacity 0.5s ease-in-out;
-    opacity: 1;
-  }
-  .welcome-fade-out {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.timeline::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  background-color: #ccc;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  margin-left: -3px;
+}
+
+/* ─────────────────────────────────────────────
+   TIMELINE: contenedores de elementos
+────────────────────────────────────────────── */
+.container {
+  padding: 10px 40px;
+  position: relative;
+  width: 50%;
+}
+
+.container.left {
+  left: 0;
+}
+
+.container.right {
+  left: 50%;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 20px;
+  background-color: #6200ea;
+  border: 4px solid white;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.container.left::before {
+  right: -12px;
+}
+
+.container.right::before {
+  left: -12px;
+}
+
+/* ─────────────────────────────────────────────
+   CONTENIDO ENVOLVENTE
+────────────────────────────────────────────── */
+.content {
+  padding: 20px;
+  background-color: white;
+  position: relative;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ─────────────────────────────────────────────
+   LAYOUT: ajuste de anchos para páginas específicas
+────────────────────────────────────────────── */
+
+/* Para páginas con layout: single */
+.layout--single .page__inner-wrap {
+  max-width: 1200px !important;
+  width: 150% !important;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+  box-sizing: border-box;
+  transform: translateX(-50px);
+}
+
+.layout--single .page__content {
+  width: 100% !important;
+}
+
+/* Para página de inicio */
+.layout--home .page {
+  max-width: 1400px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+  box-sizing: border-box;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE DE BIENVENIDA
+────────────────────────────────────────────── */
+.home-welcome-box {
+  max-width: 100%;
+  margin-bottom: 2rem;
+}
+
+.welcome-box {
+  background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
+  border-left: 6px solid #30e3ca;
+  border-radius: 12px;
+  padding: 1.8rem 2.2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  font-family: 'Open Sans', sans-serif;
+  animation: fadeIn 1s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-box::before {
+  content: "✨";
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-size: 1.6rem;
+  opacity: 0.4;
+}
+
+.welcome-box h2 {
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+  color: #2c3e50;
+}
+
+.welcome-box p {
+  font-size: 0.75rem;
+  line-height: 1.7;
+  color: #34495e;
+}
+
+#welcome-msg {
+  transition: opacity 0.5s ease-in-out;
+  opacity: 1;
+}
+
+.welcome-fade-out {
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  0% {
     opacity: 0;
+    transform: translateY(20px);
   }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-  .blog-date {
-    font-size: 0.85rem;
-    color: #888;
-    margin-bottom: 0.3rem;
-  }
-  
-  .post-categories {
-    font-size: 0.85rem;
-    color: #444;
-    margin-bottom: 0.3rem;
-  }
-  
-  .post-tags {
-    margin-bottom: 0.5rem;
-  }
-  
-  .tag-badge {
-    display: inline-block;
-    background: #e6f0ff;
-    color: #007acc;
-    font-size: 0.75rem;
-    padding: 3px 7px;
-    border-radius: 4px;
-    margin-right: 5px;
-  }
+/* ─────────────────────────────────────────────
+   METADATOS DE POSTS (fecha, etiquetas, etc.)
+────────────────────────────────────────────── */
+.blog-date {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 0.3rem;
+}
 
-  .archive__item-categories a,
-  .archive__item-tags a,
-  .archive__item-tag,
-  .archive__item-category {
-    background-color: #eef3ff;
-    color: #1a73e8 !important; /* Fuerza el color */
-    padding: 2px 6px;
-    margin: 2px 4px 0 0;
-    border-radius: 4px;
-    display: inline-block;
-    text-decoration: none;
-    font-size: 0.5rem;
-  }
-  
-  .archive__item-categories a:visited,
-  .archive__item-tags a:visited {
-    color: #1a73e8 !important; /* Mantiene color incluso si visitado */
-  }
+.post-categories {
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 0.3rem;
+}
 
-  .overview-box {
-    background: #f8f9fa;
-    border-left: 4px solid #3498db;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    margin: 2rem 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  }
-  
-  .overview-box h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .overview-box ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .overview-box li {
-    margin: 0.5rem 0;
-    font-size: 0.95rem;
-  }
-  
-  .overview-box a {
-    text-decoration: none;
-    color: #007acc;
-  }
-  
-  .overview-box a:hover {
-    text-decoration: underline;
-  }
+.post-tags {
+  margin-bottom: 0.5rem;
+}
 
+.tag-badge {
+  display: inline-block;
+  background: #e6f0ff;
+  color: #007acc;
+  font-size: 0.75rem;
+  padding: 3px 7px;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+/* ─────────────────────────────────────────────
+   CATEGORÍAS Y TAGS EN ARCHIVOS
+────────────────────────────────────────────── */
+.archive__item-categories a,
+.archive__item-tags a,
+.archive__item-tag,
+.archive__item-category {
+  background-color: #eef3ff;
+  color: #1a73e8 !important;
+  padding: 2px 6px;
+  margin: 2px 4px 0 0;
+  border-radius: 4px;
+  display: inline-block;
+  text-decoration: none;
+  font-size: 0.5rem;
+}
+
+.archive__item-categories a:visited,
+.archive__item-tags a:visited {
+  color: #1a73e8 !important;
+}
+
+/* ─────────────────────────────────────────────
+   ARCHIVO DE POSTS - CONTENIDO Y FORMATO
+────────────────────────────────────────────── */
+
+/* Fecha debajo del título del post */
+.archive__item-date {
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+/* Título del post con color personalizado */
+.archive__item-title a {
+  color: #30e3ca;
+  text-decoration: none;
+}
+
+.archive__item-title a:hover {
+  color: #1db5a0;
+  text-decoration: underline;
+}
+
+/* Imagen de preview del post */
+.archive__item-teaser img {
+  max-width: 40%;
+  height: auto;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+/* Imagen en miniatura dentro del post */
+.excerpt-thumb {
+  width: 100px;
+  height: auto;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  object-fit: cover;
+  display: block;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUES DE INFORMACIÓN / OVERVIEW
+────────────────────────────────────────────── */
+.overview-box {
+  background: #f8f9fa;
+  border-left: 4px solid #3498db;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin: 2rem 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.overview-box h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.overview-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.overview-box li {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.overview-box a {
+  text-decoration: none;
+  color: #007acc;
+}
+
+.overview-box a:hover {
+  text-decoration: underline;
+}
+
+/* ─────────────────────────────────────────────
+   TARJETAS DE ENLACES RÁPIDOS (HOME)
+────────────────────────────────────────────── */
+.quick-links-grid.fixed-layout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 2.5rem 0;
+}
+
+.quick-link-card {
+  background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
+  border-left: 5px solid #30e3ca;
+  border-radius: 10px;
+  padding: 0.8rem;
+  text-align: center;
+  text-decoration: none;
+  color: #2c3e50;
+  font-family: 'Open Sans', sans-serif;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.quick-link-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.quick-link-card .icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.quick-link-card h4 {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
+.quick-link-card p {
+  font-size: 0.72rem;
+  color: #444;
+  line-height: 1.4;
+}
+
+/* Responsive: tarjetas en pantallas más pequeñas */
+@media (max-width: 768px) {
   .quick-links-grid.fixed-layout {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Fuerza 3 columnas */
-    gap: 1rem;
-    margin: 2.5rem 0;
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  .quick-link-card {
-    background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
-    border-left: 5px solid #30e3ca;
-    border-radius: 10px;
-    padding: 0.8rem;
-    text-align: center;
-    text-decoration: none;
-    color: #2c3e50;
-    font-family: 'Open Sans', sans-serif;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    min-height: 180px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .quick-links-grid.fixed-layout {
+    grid-template-columns: 1fr;
   }
-  
-  .quick-link-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-  }
-  
-  .quick-link-card .icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.4rem;
-  }
-  
-  .quick-link-card h4 {
-    margin: 0.2rem 0;
-    font-size: 0.9rem;
-    color: #2c3e50;
-  }
-  
-  .quick-link-card p {
-    font-size: 0.72rem;
-    color: #444;
-    line-height: 1.4;
-  }
-  
-  /* Responsivo: para pantallas pequeñas */
-  @media (max-width: 768px) {
-    .quick-links-grid.fixed-layout {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .quick-links-grid.fixed-layout {
-      grid-template-columns: 1fr;
-    }
-  }
-  
-  
+}
+
+/* ─────────────────────────────────────────────
+   AJUSTE DE MÁRGEN SUPERIOR PARA TÍTULOS DE PÁGINA
+────────────────────────────────────────────── */
+.page .page__title {
+  margin-top: 1rem !important;  /* Puedes ajustar a 0.5rem o 0 si lo quieres más pegado */
+}

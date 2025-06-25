@@ -24,6 +24,10 @@
     height: 180px;
     object-fit: cover;
   }
+
+  .project-card.big-image img {
+    height: 350px; /* o el valor que prefieras */
+  }
   
   .project-card h3 {
     margin: 1rem 0 0.5rem;

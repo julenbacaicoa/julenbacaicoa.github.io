@@ -1,3 +1,9 @@
+{%- comment -%}
+──────────────────────────────────────────────
+Preprocesamiento: título limpio y teaser (imagen destacada)
+──────────────────────────────────────────────
+{%- endcomment -%}
+
 {% if post.header.teaser %}
   {% capture teaser %}{{ post.header.teaser }}{% endcapture %}
 {% else %}
@@ -10,38 +16,77 @@
   {% assign title = post.title %}
 {% endif %}
 
+{%- comment -%}
+──────────────────────────────────────────────
+Contenedor general de cada post listado
+──────────────────────────────────────────────
+{%- endcomment -%}
+
 <div class="{{ include.type | default: 'list' }}__item">
   <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork"{% if post.locale %} lang="{{ post.locale }}"{% endif %}>
-    
-    {% if include.type == "grid" and teaser %}
-      <div class="archive__item-teaser">
-        <img src="{{ teaser | relative_url }}" alt="">
-      </div>
-    {% endif %}
 
+    {%- comment -%}
+    Título del post, con enlace al post completo.
+    Si `post.link` existe, muestra dos enlaces (externo + permalink).
+    {%- endcomment -%}
     <h2 class="archive__item-title no_toc" itemprop="headline">
       {% if post.link %}
-        <a href="{{ post.link }}">{{ title }}</a> <a href="{{ post.url | relative_url }}" rel="permalink"><i class="fas fa-link" aria-hidden="true" title="permalink"></i><span class="sr-only">Permalink</span></a>
+        <a href="{{ post.link }}">{{ title }}</a>
+        <a href="{{ post.url | relative_url }}" rel="permalink">
+          <i class="fas fa-link" aria-hidden="true" title="permalink"></i>
+          <span class="sr-only">Permalink</span>
+        </a>
       {% else %}
         <a href="{{ post.url | relative_url }}" rel="permalink">{{ title }}</a>
       {% endif %}
     </h2>
 
+    {%- comment -%}
+    Fecha de publicación
+    {%- endcomment -%}
     <p class="archive__item-date">{{ post.date | date: "%B %d, %Y" }}</p>
 
-    {% if post.excerpt %}
-      <p class="archive__item-excerpt" itemprop="description">{{ post.excerpt | markdownify | strip_html | truncate: 300 }}</p>
+    {%- comment -%}
+    Imagen destacada (excerpt_image o teaser). Aparece como miniatura con enlace.
+    {%- endcomment -%}
+    {% assign image_url = post.excerpt_image | default: post.header.teaser | default: site.teaser %}
+    {% if image_url %}
+      <div class="archive__item-teaser">
+        <a href="{{ post.url | relative_url }}">
+          <img src="{{ image_url | relative_url }}" alt="" class="excerpt-thumb">
+        </a>
+      </div>
     {% endif %}
 
+    {%- comment -%}
+    Extracto del post (resumen truncado con formato conservado)
+    {%- endcomment -%}
+    {% if post.excerpt %}
+      <p class="archive__item-excerpt" itemprop="description">
+        {{ post.excerpt | markdownify | truncate: 600 }}
+      </p>
+    {% endif %}
+
+    {%- comment -%}
+    Meta información adicional: categorías y etiquetas
+    {%- endcomment -%}
     <div class="archive__meta-wrap">
+
+      {%- comment -%}
+      Categorías del post
+      {%- endcomment -%}
       {% if post.categories %}
         <div class="archive__item-categories" style="font-size: 0.85rem; margin-top: 0.5rem;">
-          📁 {% for category in post.categories %}
+          📁
+          {% for category in post.categories %}
             <a href="{{ '/categories/' | relative_url }}{{ category | slugify }}/" class="archive__item-category">{{ category }}</a>
           {% endfor %}
         </div>
       {% endif %}
 
+      {%- comment -%}
+      Etiquetas del post
+      {%- endcomment -%}
       {% if post.tags %}
         <div class="archive__item-tags" style="font-size: 0.75rem; margin-top: 0.3rem;">
           {% for tag in post.tags %}
@@ -51,6 +96,10 @@
       {% endif %}
     </div>
 
+    {%- comment -%}
+    Información adicional definida en `page__meta.html`, como autor, lectura, etc.
+    {%- endcomment -%}
     {% include page__meta.html type=include.type %}
+
   </article>
 </div>

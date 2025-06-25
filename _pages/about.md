@@ -5,9 +5,15 @@ permalink: /about/
 author_profile: true
 ---
 
-## 👋 Welcome
+## 👋🏻 Welcome
 
-I'm **Julen Bacaicoa**, a researcher passionate about mechanical engineering, code, and data.
+<p>
+  I'm <strong>Julen Bacaicoa</strong>, a researcher passionate about mechanical engineering, code, and data. I enjoy turning complex problems into clear, actionable insights through modeling and analysis.
+</p>
+
+<p>
+  Here, I share what I learn, build, and explore—<strong style="color:#30e3ca;">here to connect, collaborate, and grow</strong>.
+</p>
 
 ---
 
@@ -29,38 +35,40 @@ I'm **Julen Bacaicoa**, a researcher passionate about mechanical engineering, co
     <div class="content">
       <h3>2025 – Present</h3>
       <strong>Assistant Professor, UPNA</strong>
-      <p>Teaching and research in applied mechanics systems.</p>
+      <p>Teaching and research in the field of mechanical engineering, with a focus on applied mechanics and system analysis.</p>
     </div>
   </div>
 
   <div class="container right">
     <div class="content">
-      <h3>2019 – 2023</h3>
-      <strong>Research Fellow, Tecnalia</strong>
-      <p>Development of predictive models and machine learning applications.</p>
+      <h3>2021 – 2024</h3>
+      <strong>Associate Professor, UPNA</strong>
+      <p>Teaching in mechanical engineering subjects, primarily related to applied mechanics and structural analysis.</p>
     </div>
   </div>
 
   <div class="container left">
     <div class="content">
-      <h3>2016</h3>
-      <strong>Intern, CERN</strong>
-      <p>Worked on data analysis for particle physics with ROOT.</p>
+      <h3>2018-2024</h3>
+      <strong>Project Collaborator and Assistant, UPNA</strong>
+      <p>Research on different applied and theoretical topics in the field of mechanical engineering within multiple collaborative projects.</p>
     </div>
   </div>
 </div>
 
-
 ---
 
-## 🛠 Skills
+## 🧠💻📊 Skills
 
 - Python, MATLAB, LaTeX  
-- Signal processing, Machine Learning, Optimization  
-- Git, Jekyll, Linux
+- Data analysis, modeling, and algorithm development
 
 ---
 
-## 🌱 Hobbies
+## Hobbies
 
-Cycling, photography, travel, music, and open science.
+- 🚴 Cycling  
+- 🌍 Traveling
+- 🌿 Nature  
+- 🎶 Music  
+- 🔬 Open science
