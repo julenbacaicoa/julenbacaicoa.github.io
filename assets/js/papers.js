@@ -116,7 +116,22 @@ function renderCharts() {
           }
         }
       }
-    }
+    },
+    plugins: [{
+      id: 'centerText',
+      beforeDraw(chart) {
+        const { width, height, ctx } = chart;
+        ctx.save();
+        const text = `${papers.length} Papers`;
+        const fontSize = Math.min(width, height) / 16; // ajusta proporción aquí
+        ctx.font = `${fontSize}px 'Open Sans', sans-serif`;
+        ctx.fillStyle = '#444';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, width / 2, height / 2);
+        ctx.restore();
+      }
+    }]
   });
 
   // 📊 Gráfico apilado por año y cuartil
