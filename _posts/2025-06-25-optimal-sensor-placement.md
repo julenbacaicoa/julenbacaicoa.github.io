@@ -6,6 +6,7 @@ mathjax: true
 categories: [blog]
 tags: [strain gauges, mechanical loads, optimization]
 excerpt_image: /assets/images/blog/gauge_acotation.png
+published: false
 ---
 
 Have you ever wondered how to **estimate loads** acting on a circular shaft... using just a few strain measurements? Can we **reduce sensor count** and still estimate all loads with precision?  

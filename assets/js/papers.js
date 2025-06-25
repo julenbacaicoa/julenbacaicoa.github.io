@@ -29,15 +29,15 @@ const papers = [
     pdf: "https://hdl.handle.net/2454/48046",
     award: "bronze"
   },
-  {
-    title: "Impact of Strain Gauge Misalignment and Model Parameters on Load Estimation in Wind Turbines",
-    authors: "J. Bacaicoa, X. Iriarte, J. Aginaga, A. Plaza",
-    venue: "Measurement",
-    year: "2025",
-    quartile: "Q1",
-    link: "https://doi.org/",
-    pdf: "https://hdl.handle.net/"
-  },
+  //{
+  //  title: "Impact of Strain Gauge Misalignment and Model Parameters on Load Estimation in Wind Turbines",
+  //  authors: "J. Bacaicoa, X. Iriarte, J. Aginaga, A. Plaza",
+  //  venue: "Measurement",
+  //  year: "2025",
+  //  quartile: "Q1",
+  //  link: "https://doi.org/",
+  //  pdf: "https://hdl.handle.net/"
+  //},
   {
     title: "Design, Manufacturing, Validation of a Multi-Orientation Tilt Test Bench for Testing Vehicles Rollover and Tests of ATV-Quad for Agricultural Applications",
     authors: "J. Bacaicoa, T. Ballesteros, I. Arana, J. Aginaga, J.I. Latorre-Biel",
