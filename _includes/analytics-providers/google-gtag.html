@@ -1,9 +1,22 @@
-<!-- Global site tag (gtag.js) - Google Analytics -->
+{%- comment -%}
+  Google Analytics 4 + eventos de clic en PDF/DOI
+  Este archivo sobre-escribe el que trae Minimal-Mistakes por defecto.
+{%- endcomment -%}
+
+<!-- Google Analytics (GA4) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.analytics.google.tracking_id }}"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
+
   gtag('js', new Date());
 
-  gtag('config', '{{ site.analytics.google.tracking_id }}', { 'anonymize_ip': {{ site.analytics.google.anonymize_ip | default: false }}});
+  /* Carga de configuración.
+     anonymize_ip viene de _config.yml (true/false)                 */
+  gtag('config', '{{ site.analytics.google.tracking_id }}', {
+    anonymize_ip: {{ site.analytics.google.anonymize_ip | default: false }}
+  });
 </script>
+
+<!-- Eventos personalizados (descarga PDF / clic DOI) -->
+<script src="{{ '/assets/js/analytics-events.js' | relative_url }}" defer></script>
