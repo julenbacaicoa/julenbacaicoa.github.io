@@ -33,8 +33,16 @@ const projects = [
   }
   
   document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById("projects-container");
-    container.className = "projects-grid";
-    container.innerHTML = projects.map(createProjectCard).join("");
+  const container = document.getElementById("projects-container");
+
+  // ✅ Crea un div interno con class="projects-grid"
+  const grid = document.createElement("div");
+  grid.className = "projects-grid";
+
+  // ✅ Llena ese div con las tarjetas
+  grid.innerHTML = projects.map(createProjectCard).join("");
+
+  // ✅ Añade el grid dentro del contenedor
+  container.appendChild(grid);
   });
   
