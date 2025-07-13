@@ -1,46 +1,74 @@
+/* === Contenedor principal del grid de proyectos === */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* grid responsivo */
   gap: 2rem;
-  padding: 2rem 1rem; /* padding horizontal añadido */
-  max-width: 1200px;   /* opcional, para limitarlo */
-  margin: 0 auto;      /* centra el grid */
-  box-sizing: border-box; /* asegura que padding no cause overflow */
+  padding: 2rem 1rem;            /* espacio interior horizontal para evitar bordes pegados */
+  max-width: 1200px;             /* limita el ancho máximo del grid */
+  margin: 0 auto;                /* centra el grid horizontalmente */
+  box-sizing: border-box;        /* asegura que el padding no cause desbordamiento */
 }
-  
-  .project-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-    transition: transform 0.2s ease;
-    cursor: pointer;
-    text-align: center;
-  }
-  
-  .project-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .project-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-  }
 
-  .project-card.big-image img {
-    height: 350px; /* o el valor que prefieras */
-  }
-  
-  .project-card h3 {
-    margin: 1rem 0 0.5rem;
-    font-size: 1.2rem;
-    color: #333;
-  }
-  
-  .project-card p {
-    padding: 0 1rem 1.5rem;
-    color: #555;
-    font-size: 0.95rem;
-  }
-  
+/* === Tarjeta individual del proyecto === */
+.project-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;                   /* fuerza que no exceda el contenedor */
+  max-width: 100%;               /* asegura que nunca se pase del ancho disponible */
+  box-sizing: border-box;        /* aplica padding y border correctamente */
+}
+
+/* === Efecto hover de la tarjeta === */
+.project-card:hover {
+  transform: translateY(-5px);
+}
+
+/* === Imagen dentro de la tarjeta === */
+.project-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;             /* recorta sin deformar la imagen */
+  display: block;                /* elimina espacios blancos debajo de la imagen */
+  max-width: 100%;               /* importante para evitar overflow en móviles */
+}
+
+/* === Variante de tarjeta con imagen más grande === */
+.project-card.big-image img {
+  height: 350px; /* se puede ajustar según necesidad */
+}
+
+/* === Título del proyecto === */
+.project-card h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* === Descripción del proyecto === */
+.project-card p {
+  padding: 0 1rem 1.5rem;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* === Contenedor general que aloja las tarjetas (JS lo inyecta en #projects-container) === */
+#projects-container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  box-sizing: border-box;
+  overflow-x: hidden;            /* evita scroll horizontal si algo se sale */
+  max-width: 100%;               /* fuerza contenedor a nunca desbordar */
+}
+
+/* === Reglas globales útiles por si faltan en tu base === */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  box-sizing: border-box;
+}
