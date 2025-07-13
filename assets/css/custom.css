@@ -72,13 +72,23 @@
 ────────────────────────────────────────────── */
 
 /* Para páginas con layout: single */
+/* Estilo general para pantallas grandes */
 .layout--single .page__inner-wrap {
-  max-width: 1200px !important;
-  width: 150% !important;
-  margin: 0 auto !important;
-  padding: 0 2rem !important;
+  max-width: 1200px;
+  width: 150%;
+  margin: 0 auto;
+  padding: 0 2rem;
   box-sizing: border-box;
   transform: translateX(-50px);
+}
+
+/* En pantallas pequeñas (menores a 768px), ajustar a 100% */
+@media (max-width: 767px) {
+  .layout--single .page__inner-wrap {
+    width: 100% !important;
+    transform: none !important;
+    padding: 0 1rem !important;
+  }
 }
 
 .layout--single .page__content {
@@ -334,16 +344,35 @@
   line-height: 1.4;
 }
 
-/* Responsive: tarjetas en pantallas más pequeñas */
+/* Responsive: tarjetas en pantallas pequeñas y móviles */
 @media (max-width: 768px) {
   .quick-links-grid.fixed-layout {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* SIEMPRE 2 columnas en <=768px */
+    gap: 0.8rem;
+    padding: 0 1rem;
   }
-}
 
-@media (max-width: 480px) {
-  .quick-links-grid.fixed-layout {
-    grid-template-columns: 1fr;
+  .quick-link-card {
+    padding: 0.8rem 1rem;
+    min-height: 140px;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .quick-link-card .icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .quick-link-card h4 {
+    font-size: 1rem;
+    margin: 0.3rem 0;
+  }
+
+  .quick-link-card p {
+    font-size: 0.78rem;
   }
 }
 
