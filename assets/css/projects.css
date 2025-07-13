@@ -1,9 +1,12 @@
 .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    padding: 2rem 0;
-  }
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 2rem 1rem; /* padding horizontal añadido */
+  max-width: 1200px;   /* opcional, para limitarlo */
+  margin: 0 auto;      /* centra el grid */
+  box-sizing: border-box; /* asegura que padding no cause overflow */
+}
   
   .project-card {
     background: white;
