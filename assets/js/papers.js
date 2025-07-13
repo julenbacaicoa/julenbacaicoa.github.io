@@ -43,7 +43,7 @@ const papers = [
     authors: "J. Bacaicoa, T. Ballesteros, I. Arana, J. Aginaga, J.I. Latorre-Biel",
     venue: "Applied Sciences",
     year: "2021",
-    quartile: "Q1",
+    quartile: "Q2",
     link: "https://doi.org/10.3390/app11062575",
     pdf: "https://hdl.handle.net/2454/47130"
   },
