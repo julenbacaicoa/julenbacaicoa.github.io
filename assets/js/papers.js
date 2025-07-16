@@ -21,7 +21,7 @@ const papers = [
   },
   {
     title: "A unified analytical disk cam profile generation methodology using the Instantaneous Center of Rotation for educational purpose",
-    authors: "X. Iriate, J. Bacaicoa, A. Plaza, J. Aginaga",
+    authors: "X. Iriarte, J. Bacaicoa, A. Plaza, J. Aginaga",
     venue: "Mechanism and Machine Theory",
     year: "2024",
     quartile: "Q1",
