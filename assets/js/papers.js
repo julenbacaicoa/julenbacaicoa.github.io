@@ -43,7 +43,7 @@ const papers = [
     authors: "J. Bacaicoa, T. Ballesteros, I. Arana, J. Aginaga, J.I. Latorre-Biel",
     venue: "Applied Sciences",
     year: "2021",
-    quartile: "Q2",
+    quartile: "Q1",
     link: "https://doi.org/10.3390/app11062575",
     pdf: "https://hdl.handle.net/2454/47130"
   },
@@ -52,7 +52,7 @@ const papers = [
     authors: "J. Bacaicoa, M. Hualde-Otamendi, M. Merino-Olagüe, A. Plaza, X. Iriarte, C. Castellano-Aldave, A. Carlosena",
     venue: "Data in Brief",
     year: "2024",
-    quartile: "Q2",
+    quartile: "Q3",
     link: "https://doi.org/10.1016/j.dib.2024.111126",
     pdf: "https://academica-e.unavarra.es/handle/2454/52653"
   }
