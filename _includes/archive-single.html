@@ -49,7 +49,7 @@ Contenedor general de cada post listado
     {%- comment -%}
     Imagen destacada (excerpt_image o teaser). Aparece como miniatura con enlace.
     {%- endcomment -%}
-    {% assign image_url = post.excerpt_image | default: post.header.teaser | default: site.teaser %}
+    {% assign image_url = post.image | default: post.excerpt_image | default: post.header.teaser | default: site.teaser %}
     {% if image_url %}
       <div class="archive__item-teaser">
         <a href="{{ post.url | relative_url }}">

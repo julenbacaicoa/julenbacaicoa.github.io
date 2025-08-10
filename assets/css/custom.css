@@ -93,6 +93,8 @@
 
 .layout--single .page__content {
   width: 100% !important;
+  text-align: justify;
+  text-justify: inter-word; /* para mejor justificación */
 }
 
 /* Para página de inicio */
