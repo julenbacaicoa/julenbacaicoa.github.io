@@ -10,19 +10,19 @@ image: /assets/images/blog/gauge_acotation.png
 published: true
 ---
 
-## Overview
+## 🧐 Overview
 
 > What if I told you that you don't need dozens of strain gauges and a forest of Wheatstone bridges to recover the full 6 load components, known technically as wrench, acting on a circular shaft? By measuring **individual quarter‑bridge gauges**, arranging them in carefully optimised locations and orientations, and solving a compact linear inverse problem, you can estimate the full wrench using **only 6 gauges** (or **8 gauges** if you also want in‑built temperature compensation). This post walks the math, the optimisation criterion, practical placements, calibration recipes and the lab validation. 
 
 ---
 
-## Why should you care?
+## 💡 Why should you care?
 
 Do you build rotating shafts, drivetrains, dynamometers or force sensors? Then you know measurement cost, wiring complexity and thermal drift are real pains. The classical approach places dedicated bridges for each load component (many gauges). The approach described in the paper flips that idea: measure **individual gauge strains** and treat the wrench as a joint estimation problem — the geometry of the gauges encodes how each gauge “sees” all six load components. The outcome: fewer sensors, simpler wiring, and (with clever design) temperature compensation built into the geometry. 
 
 ---
 
-## Intuition — what's happening under the hood?
+## 🧠 Intuition — what's happening under the hood?
 
 Think of each strain gauge as a linear sensor that returns a number — the local axial strain in the direction of the gauge. That scalar is a linear combination of the six load components (three forces and three moments) acting on the cross‑section. So with $$n$$ gauges we write a linear system
 
@@ -51,7 +51,7 @@ Figure 1 is your road‑map: $$\varphi$$ locates the gauge around the circumfere
 
 ---
 
-## The math (kept compact — but faithful)
+## 📐 The math (kept compact — but faithful)
 
 ### The local gauge model
 
@@ -238,7 +238,7 @@ These expressions expose the trade-off: a single $$\alpha$$ cannot simultaneousl
 
 ---
 
-## Practical calibration recipe (from the lab section)
+## 🛠️ Practical calibration recipe (from the lab section)
 
 The experimental section describes a careful calibration procedure for an 8‑gauge configuration. The paper recommends the following steps (condensed):
 
@@ -302,12 +302,7 @@ Repeat the sinusoidal fit on $$\boldsymbol{\varepsilon}_{t,\mathrm{cal}}$$ to ob
 For each gauge:
 
 $$
-\varepsilon^{i}_{m,\mathrm{cal}}
-=
-\frac{X^{i}_{t,\mathrm{cal}}}{X^{i}_{m}}
-\left(\varepsilon^{i}_{m} - C^{i}_{m}\,\mathbf{1}\right)
-+
-C^{i}_{t,\mathrm{cal}}\,\mathbf{1}.
+\varepsilon^{i}_{m,\mathrm{cal}}=\frac{X^{i}_{t,\mathrm{cal}}}{X^{i}_{m}}\left(\boldsymbol{\varepsilon}^{i}_{m} - C^{i}_{m}\,\mathbf{1}\right)+C^{i}_{t,\mathrm{cal}}\,\mathbf{1}.
 $$
 
 The full procedure is repeatable; follow it closely if you plan a precise calibration. Next, you can find an example of the calibration procedure code on $$\mathtt{Python}$$:
@@ -640,7 +635,7 @@ t_hat = K @ eps_meas
 
 ---
 
-## Closing thoughts
+## 🤔 Closing thoughts
 
 This approach is a reminder that **measurement design is not just about adding more sensors — it’s about placing the right ones in the right place**. The elegance here lies in reducing complexity without losing observability.  
 
@@ -650,13 +645,13 @@ And remember, <strong style="color:#30e3ca;">"Sometimes less truly is more".</st
 
 ---
 
-## Credits & reference
+## 📚 Credits & reference
 
 This post faithfully summarises and visualises the results from:  
 <div style="border-left: 4px solid #30e3ca; padding: 0.8em 1em; background: #f9f9f9; font-size: 0.95em;">
-  📚 <strong>X. Iriarte, J. Aginaga, G. Gainza, J. Ros, <u>J. Bacaicoa</u></strong>, 
-  <em>Optimal strain-gauge placement for mechanical load estimation in circular cross-section shafts</em>, 
-  <strong><em>Measurement</em></strong>, 174 (2021) 108938.  
+  <strong>X. Iriarte, J. Aginaga, G. Gainza, J. Ros, <u>J. Bacaicoa</u></strong><br>
+  <em>Optimal strain-gauge placement for mechanical load estimation in circular cross-section shafts</em><br>
+  <strong><em>Measurement</em></strong>, 174 (2021) 108938<br>
   <a href="https://doi.org/10.1016/j.measurement.2020.108938">🔗 Read on <em>Measurement</em> journal</a>
 </div>
 
