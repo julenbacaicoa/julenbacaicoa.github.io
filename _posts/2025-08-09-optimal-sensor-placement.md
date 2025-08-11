@@ -33,7 +33,7 @@ $$
 where:
 * $$\boldsymbol{\varepsilon} \in \mathbb{R}^n$$ is the vector of gauge strains (true mechanical strain),
 * $$\mathbf{t} = (F_1,F_2,F_3,M_1,M_2,M_3)^\top$$ is the wrench ($$p = 6$$),
-* $$W(\vartheta)$$ is the $$n\times p$$ observation matrix built from the positions/orientations parameter vector $$\vartheta$$ (angles $$\varphi_i,\delta_i$$). 
+* $$\mathbf{W}(\boldsymbol{\vartheta})$$ is the $$n\times p$$ observation matrix built from the positions/orientations parameter vector $$\boldsymbol{\vartheta}$$ (angles $$\varphi_i,\delta_i$$). 
 
 If $$\mathbf{W}$$ has full rank ($$p = 6$$), we can invert (or pseudo‑invert) to get an estimator of the wrench from the measured strains — but the quality of that estimate depends *crucially* on the choice of gauge geometry (i.e., $$\mathbf{W}$$). So — where do we place the gauges to make $$\mathbf{W}$$ maximally informative? 
 
