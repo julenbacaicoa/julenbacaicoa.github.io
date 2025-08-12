@@ -6,7 +6,7 @@ categories: [papers, sensors]
 tags: [strain-gauges, optimal-placement, sensor-design, experimentation]
 author_profile: true
 excerpt: "How to get a full 6 load components estimate from a tiny, optimised set of strain gauges — theory, optimisation, and practical calibration."
-image: /assets/images/blog/gauge_acotation.png
+image: /assets/images/blog/gauge_acotation.jpg
 published: true
 ---
 
@@ -41,7 +41,7 @@ If $$\mathbf{W}$$ has full rank ($$p = 6$$), we can invert (or pseudo‑invert) 
 
 <!-- Figura 1 -->
 <div style="text-align:center;margin:1.5rem 0">
-  <img src="/assets/images/blog/gauge_acotation.png" alt="Figure 1 — Gauge geometry and angle definitions" style="width:70%; height:auto;">
+  <img src="/assets/images/blog/gauge_acotation.jpg" alt="Figure 1 — Gauge geometry and angle definitions" style="width:70%; height:auto;">
   <p style="font-style: italic; font-size: 0.9em; margin-top: 0.5rem;">
     Figure 1 — Gauge geometry and angle definitions
   </p>
@@ -157,7 +157,8 @@ so temperature can be treated as an extra parameter ($$p \Rightarrow p+1$$). Wit
 
 With 8 gauges (two rosettes of 4 gauges), the paper gives symmetric configurations that fully compensate the apparent thermal strain for all mechanical components (i.e., $$p = 7$$ system with temperature included). Two practical solutions for 8 gauges are provided below — one corresponds to a $$60^\circ$$ rosette variant, the other to a $$90^\circ$$ rosette—both are symmetric and friendly for manufacturing.
 
-$$\begin{aligned} {60}^{\circ} \text{ rosette}\\ \small{(\text{for } \nu=1/3)} \end{aligned} \quad \left| \quad
+$$
+\begin{aligned} {60}^{\circ} \text{ rosette}\\ \small{(\text{for } \nu=1/3)} \end{aligned} \quad \left| \quad
 \begin{aligned}
 \boldsymbol{\varphi}^{\text{opt}} &= (0^\circ,0^\circ,90^\circ,90^\circ,180^\circ,180^\circ,270^\circ,270^\circ)\\[4pt]
 \boldsymbol{\delta}^{\text{opt}} &= (-9.9^\circ,50.1^\circ,9.9^\circ,-50.1^\circ,-9.9^\circ,50.1^\circ,9.9^\circ,-50.1^\circ)
@@ -165,7 +166,8 @@ $$\begin{aligned} {60}^{\circ} \text{ rosette}\\ \small{(\text{for } \nu=1/3)} \
 \right.
 $$
 
-$$\begin{aligned} {90}^{\circ} \text{ rosette}\\ \small{(\text{for any } \nu)} \end{aligned} \quad \left| \quad
+$$
+\begin{aligned} {90}^{\circ} \text{ rosette}\\ \small{(\text{for any } \nu)} \end{aligned} \quad \left| \quad
 \begin{aligned}
 \boldsymbol{\varphi}^{\text{opt}} &= (0^\circ,0^\circ,90^\circ,90^\circ,180^\circ,180^\circ,270^\circ,270^\circ)\\[4pt]
 \boldsymbol{\delta}^{\text{opt}} &= (60^\circ,-30^\circ,30^\circ,-60^\circ,60^\circ,-30^\circ,30^\circ,-60^\circ)\phantom{----.}
@@ -198,7 +200,7 @@ $$
 ## 📊 Optimal Configurations at a glance
 
 The optimisation process in the paper converged on a small set of geometries that achieve full wrench estimation with minimal strain gauges — and, in some cases, built-in temperature compensation.  
-The table below summarises the most relevant configurations, including the optimal gauge positions ($$\varphi$$) and orientations ($$\delta$$) for each design.   These are given in degrees and $$\nu$$ is Poisson’s ratio of the shaft material.
+The table below summarises the most relevant configurations, including the optimal gauge positions ($$\boldsymbol{\varphi}$$) and orientations ($$\boldsymbol{\delta}$$) for each design.   These are given in degrees and $$\nu$$ is Poisson’s ratio of the shaft material.
 
 <div markdown="1" style="overflow-x:auto; max-width:100%;">
 
@@ -302,7 +304,7 @@ Repeat the sinusoidal fit on $$\boldsymbol{\varepsilon}_{t,\mathrm{cal}}$$ to ob
 For each gauge:
 
 $$
-\varepsilon^{i}_{m,\mathrm{cal}}=\frac{X^{i}_{t,\mathrm{cal}}}{X^{i}_{m}}\left(\boldsymbol{\varepsilon}^{i}_{m} - C^{i}_{m}\,\mathbf{1}\right)+C^{i}_{t,\mathrm{cal}}\,\mathbf{1}.
+\boldsymbol{\varepsilon}^{i}_{m,\mathrm{cal}}=\frac{X^{i}_{t,\mathrm{cal}}}{X^{i}_{m}}\left(\boldsymbol{\varepsilon}^{i}_{m} - C^{i}_{m}\,\mathbf{1}\right)+C^{i}_{t,\mathrm{cal}}\,\mathbf{1}.
 $$
 
 The full procedure is repeatable; follow it closely if you plan a precise calibration. Next, you can find an example of the calibration procedure code on $$\mathtt{Python}$$:
