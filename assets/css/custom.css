@@ -674,3 +674,96 @@ body.layout--home .page__hero--overlay .page__title {
     font-size: 0.95em;  /* ajusta a tu gusto (0.9–0.95) */
   }
 }
+
+/* ====== Autor sidebar: logos ORCID, Web of Science y UPNA ====== */
+/* No toques otros iconos; solo sustituimos los 3 específicos. */
+
+/* 1) ORCID */
+.author__urls a[href*="orcid.org"] i { display: none !important; }
+.author__urls a[href*="orcid.org"]::before {
+  content: "";
+  display: inline-block;
+  width: 1.25em;  /* tamaño cómodo */
+  height: 1.25em;
+  margin-right: .45em;
+  vertical-align: -0.2em;
+  background-color: currentColor; /* mismo gris que el texto/iconos */
+  -webkit-mask: url("/assets/icons/orcid.svg") no-repeat center / contain;
+          mask: url("/assets/icons/orcid.svg") no-repeat center / contain;
+}
+
+/* 2) Web of Science (Clarivate) */
+.author__urls a[href*="webofscience.com"] i { display: none !important; }
+.author__urls a[href*="webofscience.com"]::before {
+  content: "";
+  display: inline-block;
+  width: 1.25em;
+  height: 1.25em;
+  margin-right: .45em;
+  vertical-align: -0.2em;
+  background-color: currentColor;
+  -webkit-mask: url("/assets/icons/wos.svg") no-repeat center / contain;
+          mask: url("/assets/icons/wos.svg") no-repeat center / contain;
+}
+
+/* 3) UPNA — OJO: NO tocar el mailto de la universidad */
+.author__urls a[href*="unavarra.es"]:not([href^="mailto:"]) i { display: none !important; }
+.author__urls a[href*="unavarra.es"]:not([href^="mailto:"])::before {
+  content: "";
+  display: inline-block;
+  width: 1.40em;   /* más grande para compensar viewBox con márgenes */
+  height: 1.40em;
+  margin-right: .45em;
+  vertical-align: -0.22em;
+  background-color: currentColor;
+  -webkit-mask: url("/assets/icons/upna.svg") no-repeat center / contain;
+          mask: url("/assets/icons/upna.svg") no-repeat center / contain;
+}
+
+/* 4) GitHub */
+.author__urls a[href*="github.com"] i {
+  display: none !important; /* oculta el <i> de Font Awesome */
+}
+.author__urls a[href*="github.com"]::before {
+  content: "";
+  display: inline-block;
+  width: 1.25em;              /* ajusta si lo quieres un pelín mayor/menor */
+  height: 1.25em;
+  margin-right: .45em;
+  vertical-align: -0.2em;
+  background-color: currentColor; /* mismo gris que el texto/iconos */
+  -webkit-mask: url("/assets/icons/github.svg") no-repeat center / contain;
+          mask: url("/assets/icons/github.svg") no-repeat center / contain;
+}
+
+
+/* 5) YouTube (canal o video: youtube.com y youtu.be) */
+.author__urls a[href*="youtube.com"] i,
+.author__urls a[href*="youtu.be"] i {
+  display: none !important; /* oculta el <i> de Font Awesome */
+}
+.author__urls a[href*="youtube.com"]::before,
+.author__urls a[href*="youtu.be"]::before {
+  content: "";
+  display: inline-block;
+  width: 1.25em;
+  height: 1.25em;
+  margin-right: .45em;
+  vertical-align: -0.2em;
+  background-color: currentColor; /* mismo gris que el resto */
+  -webkit-mask: url("/assets/icons/youtube.svg") no-repeat center / contain;
+          mask: url("/assets/icons/youtube.svg") no-repeat center / contain;
+}
+
+/* (opcional) mismo efecto hover que los otros */
+.author__urls a[href*="youtube.com"]:hover::before,
+.author__urls a[href*="youtu.be"]:hover::before {
+  opacity: 1;
+}
+
+/* Hover consistente (mismo color; si quieres, ajusta aquí) */
+.author__urls a[href*="orcid.org"]:hover::before,
+.author__urls a[href*="webofscience.com"]:hover::before,
+.author__urls a[href*="unavarra.es"]:not([href^="mailto:"]):hover::before {
+  filter: none; /* sin opacidad; mismo gris que los demás iconos */
+}
