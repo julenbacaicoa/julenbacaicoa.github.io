@@ -1,8 +1,7 @@
 <!-- start custom footer snippets -->
 
-<!-- === Supabase: loader robusto con fallbacks y "ready" Promise global === -->
+<!-- Supabase JS loader con fallbacks + Promise global -->
 <script>
-  // Promesa global para esperar al SDK desde cualquier script
   window.__supabaseReady = new Promise(function (resolve) {
     function init() {
       try {
@@ -13,27 +12,33 @@
           );
         }
         resolve(window.__supabase);
-      } catch (e) {
-        console.error('Supabase init error:', e);
-      }
+      } catch (e) { console.error('Supabase init error:', e); }
     }
     function inject(src, onload) {
       var s = document.createElement('script');
-      s.src = src;
-      s.crossOrigin = 'anonymous';
-      s.referrerPolicy = 'no-referrer';
+      s.src = src; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
       s.onload = onload;
       s.onerror = function () {
-        // Fallbacks en cadena: jsDelivr -> unpkg -> skypack
         if (src.includes('jsdelivr')) inject('https://unpkg.com/@supabase/supabase-js@2', init);
         else if (src.includes('unpkg')) inject('https://cdn.skypack.dev/@supabase/supabase-js@2', init);
-        else console.error('No se pudo cargar @supabase/supabase-js desde ningún CDN');
+        else console.error('No se pudo cargar @supabase/supabase-js');
       };
       document.head.appendChild(s);
     }
     if (window.supabase) init();
     else inject('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', init);
   });
+
+  /* Slug canónico (igual que en Home): minúsculas, sin index.html, con / final */
+  window.__canonicalSlug = function (pathname) {
+    const BASE = '{{ site.baseurl | default: "" }}';
+    let s = pathname || "/";
+    if (BASE && s.startsWith(BASE)) s = s.slice(BASE.length);
+    if (!s.startsWith("/")) s = "/" + s;
+    s = s.replace(/\/index\.html$/i, "/").replace(/\/{2,}/g, "/");
+    if (s !== "/" && !s.endsWith("/")) s += "/";
+    return s.toLowerCase();
+  };
 </script>
 
 <!-- Code enhanced -->
@@ -42,32 +47,12 @@
 <!-- Code header -->
 <script src="{{ '/assets/js/code-header.js' | relative_url }}"></script>
 
-<!-- === Utilidad común: slug canónico (sin baseurl) === -->
-<script>
-  window.__canonicalSlug = function (pathname) {
-    const BASE = '{{ site.baseurl | default: "" }}';
-    let s = pathname || "/";
-    if (BASE && s.startsWith(BASE)) s = s.slice(BASE.length);
-    if (!s.startsWith("/")) s = "/" + s;
-    return s;
-  };
-</script>
-
-<!-- === Contador de vistas local + servidor (una vez por sesión) === -->
+<!-- Post reads counter (solo servidor, sin pintar UI en el post) -->
 <script>
   (function () {
     if (!document.body.classList.contains('layout--single')) return;
-
     const slug = window.__canonicalSlug(window.location.pathname);
-
-    // LocalStorage: mantener contador local como antes (clave normalizada)
-    try {
-      const key = "views_" + slug;
-      const v = (parseInt(localStorage.getItem(key) || "0", 10) || 0) + 1;
-      localStorage.setItem(key, String(v));
-    } catch (e) {}
-
-    // Servidor: incrementa UNA vez por sesión/ventana
+    // Incrementa 1 vez por sesión/ventana; no hay UI
     try {
       const seen = 'srv_viewed_' + slug;
       if (!sessionStorage.getItem(seen)) {
@@ -79,46 +64,5 @@
     } catch (e) {}
   })();
 </script>
-
-<!-- === Lectura de métricas para los <span data-post-views / data-post-likes> === -->
-<script>
-  (function () {
-    if (!document.body.classList.contains('layout--single')) return;
-
-    const slug = window.__canonicalSlug(window.location.pathname);
-
-    window.__supabaseReady
-      .then(async (sb) => {
-        try {
-          const { data } = await sb
-            .from('post_metrics')
-            .select('views,likes')
-            .eq('slug', slug)
-            .single();
-
-          const views = (data && typeof data.views === 'number') ? data.views : 0;
-          const likes = (data && typeof data.likes === 'number') ? data.likes : 0;
-
-          const vEl = document.querySelector('[data-post-views]');
-          const lEl = document.querySelector('[data-post-likes]');
-          if (vEl) vEl.replaceChildren(document.createTextNode(String(views)));
-          if (lEl) lEl.replaceChildren(document.createTextNode(String(likes)));
-        } catch (e) {
-          // Silencioso: si falla, simplemente no sobreescribimos
-        }
-      })
-      .catch(() => {
-        // Si el SDK no cargó (bloqueo CDN), no hacemos nada.
-      });
-  })();
-</script>
-
-<!-- (Opcional) Debug sencillo: ver en consola si el SDK cargó -->
-<!--
-<script>
-  window.__supabaseReady.then(() => console.log('Supabase OK')).catch(() => console.log('Supabase NO cargó'));
-  console.log('slug canónico:', window.__canonicalSlug(window.location.pathname));
-</script>
--->
 
 <!-- end custom footer snippets -->

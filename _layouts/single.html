@@ -36,12 +36,6 @@ layout: default
           </h1>
           {%- endif %}
           {% include page__meta.html %}
-
-          <!-- Bloque de vistas/likes -->
-          <p class="post-stats">
-            <span data-post-views>—</span> views · 
-            <span data-post-likes>—</span> likes
-          </p>
         </header>
       {% endunless %}
 
@@ -54,7 +48,9 @@ layout: default
             </nav>
           </aside>
         {% endif %}
+
         {{ content }}
+
         {% if page.link %}<div><a href="{{ page.link }}" class="btn btn--primary">{{ site.data.ui-text[site.locale].ext_link_label | default: "Direct Link" }}</a></div>{% endif %}
       </section>
 

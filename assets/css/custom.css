@@ -187,18 +187,35 @@ body.layout--home .page__hero--overlay .page__title { margin-top: 0 !important; 
 .home-cards { display: block; margin: 2rem 0 3rem; }
 .blogcard {
   position: relative; background: #fff; border-radius: 12px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.12); overflow: hidden;
-  min-height: 480px; margin-bottom: 2rem; padding-bottom: 90px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.12); overflow: visible;  /* antes: hidden */
+  min-height: 480px; margin: 32px 0 2rem;                      /* ↑ margen top p/que no pise lo anterior */
+  padding-bottom: 90px;
 }
 .blogcard__thumb {
-  position: absolute; left: 24px; top: -24px; width: min(52%, 520px); height: 340px;
-  border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.35); background: #eee;
+  position: absolute; left: 24px; top: -36px;                  /* antes: -24px */
+  width: min(52%, 520px); height: 340px;
+  border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  background: #eee; aspect-ratio: 16 / 10;
+  z-index: 2;                                                  /* asegura que quede por encima del card */
+  display: flex;                 /* centra el contenido */
+  align-items: center;           /* centra vertical */
+  justify-content: center;       /* centra horizontal */
+  background: #fff;
 }
-.blogcard__thumb img { position: absolute; left: 50%; top: 50%; width: 120%; height: auto; transform: translate(-50%,-50%); object-fit: cover; }
+/* FIX: imagen siempre cubre el contenedor (desktop) */
+.blogcard__thumb img {
+  position: static;              /* antes absoluto */
+  width: 100%;                   /* ajusta a la anchura del contenedor */
+  height: auto;                  /* mantiene proporción → podrá dejar barras arriba/abajo */
+  object-fit: contain;           /* evita recortes */
+  object-position: center;
+  transform: none;
+}
 .blogcard__body { margin-left: calc(min(52%, 520px) + 48px); margin-right: 24px; padding-top: 16px; padding-bottom: 8px; }
-.blogcard__title { margin: 18px 0 6px; font-size: 1.15rem; line-height: 1.25; }
-.blogcard__title a { color: #2c3e50; text-decoration: none; }
+.blogcard__title { margin: 14px 0 6px; font-size: 1.05rem; line-height: 1.2; }
+.blogcard__title a { color: #2c3e50; text-decoration: none; font-size: inherit; }
 .blogcard__title a:hover { color: #30e3ca; }
+
 .blogcard__author { display: inline-flex; align-items: center; gap: 8px; background: #9ECAFF; padding: 4px 10px; border-radius: 20px; height: 30px; }
 .blogcard__author img { width: 20px; height: 20px; border-radius: 50%; }
 .blogcard__author-name { font-size: .8rem; color: #fff; }
@@ -245,9 +262,25 @@ body.layout--home .page__hero--overlay .page__title { margin-top: 0 !important; 
 
 /* Responsive */
 @media (max-width: 860px) {
-  .blogcard { min-height: auto; padding-bottom: 86px; }
-  .blogcard__thumb { position: relative; left: 0; top: 0; width: 100%; height: 220px; border-radius: 0; box-shadow: none; }
-  .blogcard__thumb img { width: 100%; height: 100%; transform: none; }
+  .blogcard { min-height: auto; padding-bottom: 86px; overflow: hidden; margin-top: 0; }
+  /* FIX: forzar layout móvil robusto */
+  .blogcard__thumb {
+    /* ya forzabas layout móvil; mantenlo */
+    position: relative !important;
+    left: 0 !important; top: 0 !important;
+    width: 100% !important; height: auto !important;
+    aspect-ratio: 16 / 9 !important;
+    border-radius: 0; box-shadow: none;
+    display: flex; align-items: center; justify-content: center;  /* centra imagen */
+    background: #fff;                                             /* barras blancas */
+  }
+  .blogcard__thumb img {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;          /* clave: ajusta a ancho */
+    object-fit: contain !important;   /* sin recorte */
+    transform: none !important;
+  }
   .blogcard__body { margin: 0; padding: 16px 16px 0; }
   .blogcard__date { left: 16px; bottom: 16px; }
   .blogcard__date .day { font-size: 2.2rem; }
@@ -256,3 +289,10 @@ body.layout--home .page__hero--overlay .page__title { margin-top: 0 !important; 
   .blogcard__actions { right: 88px; bottom: 16px; gap: 8px; }
   .blogcard__fab { right: 16px; bottom: 16px; width: 58px; height: 58px; }
 }
+
+/* ─────────────────────────────────────────────
+   FIX: VIEWS / LIKES en single post arriba
+────────────────────────────────────────────── */
+/* Contadores arriba del post, alineados a la izquierda */
+.layout--single .post-stats{font-size:.9rem;color:#666;margin:.35rem 0 1rem;text-align:left;clear:both}
+

@@ -14,8 +14,15 @@
 <!-- Custom fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
 
-<!-- Favicon -->
-<link rel="icon" href="{{ '/assets/images/favicon.png' | relative_url }}" type="image/x-icon">
-<link rel="shortcut icon" href="{{ '/assets/images/favicon.png' | relative_url }}" type="image/x-icon">
+<!-- ===== Favicons (Safari/iOS + pinned tab + fallbacks) ===== -->
+<link rel="icon" href="{{ '/favicon.ico?v=3' | relative_url }}" sizes="any">
+<link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg?v=3' | relative_url }}">
+<link rel="apple-touch-icon" href="{{ '/apple-touch-icon.png?v=3' | relative_url }}">
+<link rel="mask-icon" href="{{ '/safari-pinned-tab.svg?v=3' | relative_url }}" color="#1875D0">
+<link rel="manifest" href="{{ '/site.webmanifest?v=3' | relative_url }}">
+<meta name="theme-color" content="#1875D0">
+
+<!-- Fallback PNG (por si aún no tienes los de raíz) -->
+<link rel="shortcut icon" href="{{ '/assets/images/favicon.png?v=3' | relative_url }}" type="image/png">
 
 <!-- end custom head snippets -->

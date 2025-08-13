@@ -1,0 +1,8 @@
+# SUPABASE INFO
+
+URL
+https://erfpcblkiyummncvsddb.supabase.co
+
+KEY
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyZnBjYmxraXl1bW1uY3ZzZGRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwOTQ5NTUsImV4cCI6MjA3MDY3MDk1NX0.oq28mgIKPWBuvCB7RzND4UBTBfe2cfswkqKVbux_HjU
+

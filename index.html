@@ -1,5 +1,5 @@
 ---
-layout: home
+layout: single
 title: "Science, Code & Curiosity"
 permalink: /
 header:
@@ -74,75 +74,59 @@ author_profile: true
   })();
 </script>
 
-<!-- Inyectamos datos de posts desde Jekyll -->
-<script>
-  const posts = [
-    {% for post in site.posts %}
-    {
-      url: "{{ post.url | relative_url }}",
-      title: {{ post.title | jsonify }},
-      excerpt: {{ post.excerpt | strip_html | strip_newlines | truncate: 220 | jsonify }},
-      image: "{{ post.header.teaser | default: post.image | default: site.teaser | relative_url }}",
-      author: {{ site.author.name | jsonify }},
-      avatar: "{{ site.author.avatar | relative_url }}",
-      day: "{{ post.date | date: '%d' }}",
-      month: "{{ post.date | date: '%B' | upcase }}",
-      year: "{{ post.date | date: '%Y' }}"
-    }{% unless forloop.last %},{% endunless %}
-    {% endfor %}
-  ];
+<!-- Inyectamos datos de posts desde Jekyll (como JSON, no JS) -->
+<script id="posts-data" type="application/json">
+[
+{% for post in site.posts %}
+  {
+    "url": "{{ post.url | relative_url }}",
+    "title": {{ post.title | jsonify }},
+    "excerpt": {{ post.excerpt | strip_html | strip_newlines | truncate: 220 | jsonify }},
+    "image": "{{ post.header.teaser | default: post.image | default: site.teaser | relative_url }}",
+    "author": {{ site.author.name | jsonify }},
+    "avatar": "{{ site.author.avatar | relative_url }}",
+    "day": "{{ post.date | date: '%d' }}",
+    "month": "{{ post.date | date: '%B' | upcase }}",
+    "year": "{{ post.date | date: '%Y' }}"
+  }{% unless forloop.last %},{% endunless %}
+{% endfor %}
+]
 </script>
 
-<!-- Construcción de cards + acciones (views readonly / like / share) -->
+<!-- Lo convertimos a objeto JS -->
+<script>
+  const posts = JSON.parse(document.getElementById('posts-data').textContent);
+</script>
+
+<!-- Construcción de cards + acciones (robusto, sin depender del footer al arrancar) -->
 <script>
   (async function () {
     const container = document.getElementById('home-posts');
     if (!container) return;
 
+    // 1) Utilidades (slug canónico igual que en el post)
     const BASE = '{{ site.baseurl | default: "" }}';
     function canonicalSlug(pathname) {
       let s = pathname || "/";
       if (BASE && s.startsWith(BASE)) s = s.slice(BASE.length);
       if (!s.startsWith("/")) s = "/" + s;
-      return s;
+      s = s.replace(/\/index\.html$/i, "/").replace(/\/{2,}/g, "/");
+      if (s !== "/" && !s.endsWith("/")) s += "/";
+      return s.toLowerCase();
     }
     function fullUrl(relative) {
-      try { return new URL(relative, window.location.origin).toString(); }
-      catch (e) { return relative; }
+      try { return new URL(relative, window.location.origin).toString(); } catch { return relative; }
     }
     function getLocalCount(key) {
       const v = localStorage.getItem(key);
       return v ? parseInt(v, 10) : 0;
     }
-    function setLocalCount(key, val) {
-      localStorage.setItem(key, String(val));
-    }
-    function getLikeState(slug) {
-      return localStorage.getItem(`like_state_${slug}`) === '1';
-    }
-    function setLikeState(slug, liked) {
-      localStorage.setItem(`like_state_${slug}`, liked ? '1' : '0');
-    }
+    function setLocalCount(key, val) { localStorage.setItem(key, String(val)); }
+    function getLikeState(slug) { return localStorage.getItem(`like_state_${slug}`) === '1'; }
+    function setLikeState(slug, liked) { localStorage.setItem(`like_state_${slug}`, liked ? '1' : '0'); }
 
-    // Espera a Supabase (si no carga, seguimos en modo "solo local")
-    let sb = null;
-    try { sb = await window.__supabaseReady; } catch (e) {}
-
-    // Trae métricas del servidor (si hay cliente)
-    let metrics = new Map();
-    if (sb) {
-      try {
-        const slugs = posts.map(p => canonicalSlug(p.url));
-        const { data, error } = await sb
-          .from('post_metrics')
-          .select('slug,views,likes')
-          .in('slug', slugs);
-        if (!error && Array.isArray(data)) {
-          metrics = new Map(data.map(r => [r.slug, r]));
-        }
-      } catch (e) {}
-    }
-
+    // 2) Pinta las cards primero (siempre)
+    const cards = [];  // guardamos refs para actualizarlas luego con servidor
     posts.forEach(p => {
       const card = document.createElement('article');
       card.className = 'blogcard';
@@ -152,11 +136,9 @@ author_profile: true
       const slug = canonicalSlug(p.url);
 
       card.innerHTML = `
-        <div class="blogcard__thumb">
-          <img src="${imgUrl}" alt="">
-        </div>
+        <div class="blogcard__thumb"><img src="${imgUrl}" alt=""></div>
         <div class="blogcard__body">
-          <h1 class="blogcard__title"><a href="${p.url}">${p.title}</a></h1>
+          <h3 class="blogcard__title"><a href="${p.url}">${p.title}</a></h3>
           <div class="blogcard__author">
             <img src="${p.avatar}" alt="${p.author}">
             <span class="blogcard__author-name">${p.author}</span>
@@ -164,13 +146,11 @@ author_profile: true
           <div class="blogcard__sep"></div>
           <p class="blogcard__excerpt">${p.excerpt}</p>
         </div>
-
         <div class="blogcard__date">
           <span class="day">${p.day}</span>
           <span class="mon">${p.month}</span>
           <span class="year">${p.year}</span>
         </div>
-
         <ul class="blogcard__actions">
           <li>
             <span class="action action-view action--readonly" title="Views">
@@ -188,65 +168,94 @@ author_profile: true
             </button>
           </li>
         </ul>
-
-        <a class="blogcard__fab" href="${p.url}" title="Read">
-          <i class="fa fa-arrow-right"></i>
-        </a>
+        <a class="blogcard__fab" href="${p.url}" title="Read"><i class="fa fa-arrow-right"></i></a>
       `;
 
-      const viewsKey  = `views_${slug}`;
-      const likesKey  = `likes_${slug}`;
       const viewsEl   = card.querySelector('[data-role="views"]');
       const likesEl   = card.querySelector('[data-role="likes"]');
       const heartIcon = card.querySelector('[data-role="heart"]');
+      const likeBtn   = card.querySelector('.action-like');
 
-      const m = metrics.get(slug);
-      const currentViews = (m && typeof m.views === 'number') ? m.views : getLocalCount(viewsKey);
-      const currentLikes = (m && typeof m.likes === 'number') ? m.likes : getLocalCount(likesKey);
-      const liked        = getLikeState(slug);
+      // Inicial: local (se actualizará con servidor más abajo)
+      const viewsKey = `views_${slug}`;
+      const likesKey = `likes_${slug}`;
+      viewsEl.textContent = getLocalCount(viewsKey);
+      likesEl.textContent = getLocalCount(likesKey);
+      if (getLikeState(slug)) heartIcon.classList.add('is-liked');
 
-      if (viewsEl) viewsEl.textContent = currentViews;
-      if (likesEl) likesEl.textContent = currentLikes;
-      if (liked) heartIcon.classList.add('is-liked');
-
-      // Like toggle (local + servidor si disponible)
-      const likeBtn = card.querySelector('.action-like');
+      // Like toggle (UI inmediata + servidor cuando esté listo)
       likeBtn.addEventListener('click', async () => {
-        const isLiked = getLikeState(slug);
+        if (likeBtn.disabled) return; likeBtn.disabled = true;
+        const was = getLikeState(slug);
         let l = parseInt(likesEl.textContent || '0', 10);
+        if (was) { l = Math.max(0, l - 1); heartIcon.classList.remove('is-liked'); setLikeState(slug, false); }
+        else     { l = l + 1;               heartIcon.classList.add('is-liked');    setLikeState(slug, true);  }
+        setLocalCount(likesKey, l);
+        likesEl.textContent = l;
 
-        if (isLiked) {
-          l = Math.max(0, l - 1);
-          heartIcon.classList.remove('is-liked');
-          setLikeState(slug, false);
-          setLocalCount(likesKey, l);
-          likesEl.textContent = l;
-          if (sb) { try { await sb.rpc('add_like', { p_slug: slug, p_delta: -1 }); } catch (e) {} }
-        } else {
-          l = l + 1;
-          heartIcon.classList.add('is-liked');
-          setLikeState(slug, true);
-          setLocalCount(likesKey, l);
-          likesEl.textContent = l;
-          if (sb) { try { await sb.rpc('add_like', { p_slug: slug, p_delta: 1 }); } catch (e) {} }
-        }
+        // Si luego hay Supabase, sincronizamos
+        try {
+          const sb = (window.__supabaseReady && typeof window.__supabaseReady.then === 'function')
+            ? await window.__supabaseReady
+            : null;
+          if (sb) {
+            const delta = was ? -1 : 1;
+            const { data, error } = await sb.rpc('add_like', { p_slug: slug, p_delta: delta });
+            if (!error && data && typeof data[0]?.likes === 'number') {
+              likesEl.textContent = String(data[0].likes);
+              setLocalCount(likesKey, data[0].likes);
+            }
+          }
+        } catch {}
+        likeBtn.disabled = false;
       });
 
-      // Compartir (igual que ya tenías)
+      // Compartir
       const shareBtn = card.querySelector('.action-share');
       shareBtn.addEventListener('click', async () => {
         try {
-          if (navigator.share) {
-            await navigator.share({ title: p.title, url: absoluteUrl });
-          } else {
+          if (navigator.share) await navigator.share({ title: p.title, url: absoluteUrl });
+          else {
             await navigator.clipboard.writeText(absoluteUrl);
-            shareBtn.title = 'Link copied!';
-            setTimeout(() => (shareBtn.title = 'Share'), 1200);
+            shareBtn.title = 'Link copied!'; setTimeout(() => (shareBtn.title = 'Share'), 1200);
           }
-        } catch (e) {}
+        } catch {}
       });
 
       container.appendChild(card);
+      cards.push({ slug, viewsEl, likesEl, viewsKey, likesKey, heartIcon });
     });
+
+    // 3) Cuando (y solo cuando) esté Supabase, lee métricas y actualiza las cards
+    try {
+      const sb = (window.__supabaseReady && typeof window.__supabaseReady.then === 'function')
+        ? await Promise.race([
+            window.__supabaseReady,
+            new Promise(res => setTimeout(() => res(null), 1200)) // no bloquear UI
+          ])
+        : null;
+
+      if (sb) {
+        const slugs = cards.map(c => c.slug);
+        const { data, error } = await sb
+          .from('post_metrics')
+          .select('slug,views,likes')
+          .in('slug', slugs);
+        if (!error && Array.isArray(data)) {
+          const map = new Map(data.map(r => [r.slug, r]));
+          for (const c of cards) {
+            const m = map.get(c.slug);
+            if (m) {
+              c.viewsEl.textContent = m.views;
+              c.likesEl.textContent = m.likes;
+              setLocalCount(c.viewsKey, m.views);
+              setLocalCount(c.likesKey, m.likes);
+            }
+          }
+        }
+      }
+    } catch {
+      /* si no hay SDK o está bloqueado, nos quedamos con local sin romper nada */
+    }
   })();
 </script>
