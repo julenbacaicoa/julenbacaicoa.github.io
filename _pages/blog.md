@@ -30,13 +30,12 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
   ];
 </script>
 
-<!-- Construcción de cards (mismo comportamiento que Home) -->
+<!-- Construcción de cards (pinta primero; sincroniza después) -->
 <script>
   (function () {
     const container = document.getElementById('blog-posts');
     if (!container || !Array.isArray(posts)) return;
 
-    /* Utilidades (igual que Home) */
     const BASE = '{{ site.baseurl | default: "" }}';
     function canonicalSlug(pathname) {
       let s = pathname || "/";
@@ -46,18 +45,12 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
       if (s !== "/" && !s.endsWith("/")) s += "/";
       return s.toLowerCase();
     }
-    function fullUrl(relative) {
-      try { return new URL(relative, window.location.origin).toString(); } catch { return relative; }
-    }
-    function getLocalCount(key) {
-      const v = localStorage.getItem(key);
-      return v ? parseInt(v, 10) : 0;
-    }
+    function fullUrl(relative) { try { return new URL(relative, location.origin).toString(); } catch { return relative; } }
+    function getLocalCount(key) { const v = localStorage.getItem(key); return v ? parseInt(v, 10) : 0; }
     function setLocalCount(key, val) { localStorage.setItem(key, String(val)); }
     function getLikeState(slug) { return localStorage.getItem(`like_state_${slug}`) === '1'; }
     function setLikeState(slug, liked) { localStorage.setItem(`like_state_${slug}`, liked ? '1' : '0'); }
 
-    /* Pintado inicial de cards (sin depender del footer) */
     const cards = [];
     posts.forEach(p => {
       const card = document.createElement('article');
@@ -103,19 +96,18 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
         <a class="blogcard__fab" href="${p.url}" title="Read"><i class="fa fa-arrow-right"></i></a>
       `;
 
-      const viewsKey  = `views_${slug}`;
-      const likesKey  = `likes_${slug}`;
       const viewsEl   = card.querySelector('[data-role="views"]');
       const likesEl   = card.querySelector('[data-role="likes"]');
       const heartIcon = card.querySelector('[data-role="heart"]');
       const likeBtn   = card.querySelector('.action-like');
 
-      /* Estado inicial local */
+      const viewsKey = `views_${slug}`;
+      const likesKey = `likes_${slug}`;
+
       viewsEl.textContent = getLocalCount(viewsKey);
       likesEl.textContent = getLocalCount(likesKey);
       if (getLikeState(slug)) heartIcon.classList.add('is-liked');
 
-      /* Like toggle (UI inmediata; si hay Supabase luego sincroniza) */
       likeBtn.addEventListener('click', async () => {
         if (likeBtn.disabled) return; likeBtn.disabled = true;
         const was = getLikeState(slug);
@@ -141,7 +133,6 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
         likeBtn.disabled = false;
       });
 
-      /* Compartir */
       const shareBtn = card.querySelector('.action-share');
       shareBtn.addEventListener('click', async () => {
         try {
@@ -157,15 +148,18 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
       cards.push({ slug, viewsEl, likesEl, viewsKey, likesKey });
     });
 
-    /* Sincroniza métricas con Supabase cuando esté disponible */
-    (async () => {
-      try {
-        const sb = (window.__supabaseReady && typeof window.__supabaseReady.then === 'function')
-          ? await window.__supabaseReady
-          : null;
-        if (!sb) return;
+    // Exponer para sincronización eventual
+    window.__cardsForSync = cards;
+  })();
+</script>
 
+<!-- Sincroniza métricas con Supabase en cuanto esté disponible (eventual, sin timeout) -->
+<script>
+  (function () {
+    async function syncFromServer(sb, cards) {
+      try {
         const slugs = cards.map(c => c.slug);
+        if (!slugs.length) return;
         const { data, error } = await sb
           .from('post_metrics')
           .select('slug,views,likes')
@@ -178,11 +172,24 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
           if (m) {
             c.viewsEl.textContent = m.views;
             c.likesEl.textContent = m.likes;
-            setLocalCount(c.viewsKey, m.views);
-            setLocalCount(c.likesKey, m.likes);
+            localStorage.setItem(c.viewsKey, String(m.views));
+            localStorage.setItem(c.likesKey, String(m.likes));
           }
         }
       } catch {}
-    })();
+    }
+
+    function trySyncNow() {
+      if (window.__supabase && typeof window.__supabase.from === 'function' && window.__cardsForSync) {
+        syncFromServer(window.__supabase, window.__cardsForSync);
+      }
+    }
+
+    trySyncNow();
+    if (window.__supabaseReady && typeof window.__supabaseReady.then === 'function') {
+      window.__supabaseReady.then(sb => {
+        if (sb && window.__cardsForSync) syncFromServer(sb, window.__cardsForSync);
+      });
+    }
   })();
 </script>
