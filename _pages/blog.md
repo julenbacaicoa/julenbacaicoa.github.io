@@ -45,11 +45,11 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
       if (s !== "/" && !s.endsWith("/")) s += "/";
       return s.toLowerCase();
     }
-    function fullUrl(relative) { try { return new URL(relative, location.origin).toString(); } catch { return relative; } }
-    function getLocalCount(key) { const v = localStorage.getItem(key); return v ? parseInt(v, 10) : 0; }
-    function setLocalCount(key, val) { localStorage.setItem(key, String(val)); }
-    function getLikeState(slug) { return localStorage.getItem(`like_state_${slug}`) === '1'; }
-    function setLikeState(slug, liked) { localStorage.setItem(`like_state_${slug}`, liked ? '1' : '0'); }
+    function fullUrl(relative){try{return new URL(relative,location.origin).toString();}catch{return relative;}}
+    function getLocalCount(k){const v=localStorage.getItem(k);return v?parseInt(v,10):0;}
+    function setLocalCount(k,v){localStorage.setItem(k,String(v));}
+    function getLikeState(slug){return localStorage.getItem(`like_state_${slug}`)==='1';}
+    function setLikeState(slug,b){localStorage.setItem(`like_state_${slug}`, b?'1':'0');}
 
     const cards = [];
     posts.forEach(p => {
@@ -96,10 +96,10 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
         <a class="blogcard__fab" href="${p.url}" title="Read"><i class="fa fa-arrow-right"></i></a>
       `;
 
-      const viewsEl   = card.querySelector('[data-role="views"]');
-      const likesEl   = card.querySelector('[data-role="likes"]');
+      const viewsEl = card.querySelector('[data-role="views"]');
+      const likesEl = card.querySelector('[data-role="likes"]');
       const heartIcon = card.querySelector('[data-role="heart"]');
-      const likeBtn   = card.querySelector('.action-like');
+      const likeBtn = card.querySelector('.action-like');
 
       const viewsKey = `views_${slug}`;
       const likesKey = `likes_${slug}`;
@@ -112,15 +112,13 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
         if (likeBtn.disabled) return; likeBtn.disabled = true;
         const was = getLikeState(slug);
         let l = parseInt(likesEl.textContent || '0', 10);
-        if (was) { l = Math.max(0, l - 1); heartIcon.classList.remove('is-liked'); setLikeState(slug, false); }
-        else     { l = l + 1;               heartIcon.classList.add('is-liked');    setLikeState(slug, true);  }
+        if (was) { l = Math.max(0,l-1); heartIcon.classList.remove('is-liked'); setLikeState(slug,false); }
+        else     { l = l+1;             heartIcon.classList.add('is-liked');    setLikeState(slug,true);  }
         setLocalCount(likesKey, l);
         likesEl.textContent = l;
 
         try {
-          const sb = (window.__supabaseReady && typeof window.__supabaseReady.then === 'function')
-            ? await window.__supabaseReady
-            : null;
+          const sb = (window.__supabaseReady && typeof window.__supabaseReady.then==='function') ? await window.__supabaseReady : null;
           if (sb) {
             const delta = was ? -1 : 1;
             const { data, error } = await sb.rpc('add_like', { p_slug: slug, p_delta: delta });
@@ -137,10 +135,7 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
       shareBtn.addEventListener('click', async () => {
         try {
           if (navigator.share) await navigator.share({ title: p.title, url: absoluteUrl });
-          else {
-            await navigator.clipboard.writeText(absoluteUrl);
-            shareBtn.title = 'Link copied!'; setTimeout(() => (shareBtn.title = 'Share'), 1200);
-          }
+          else { await navigator.clipboard.writeText(absoluteUrl); shareBtn.title='Link copied!'; setTimeout(()=>shareBtn.title='Share',1200); }
         } catch {}
       });
 
@@ -148,12 +143,11 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
       cards.push({ slug, viewsEl, likesEl, viewsKey, likesKey });
     });
 
-    // Exponer para sincronización eventual
     window.__cardsForSync = cards;
   })();
 </script>
 
-<!-- Sincroniza métricas con Supabase en cuanto esté disponible (eventual, sin timeout) -->
+<!-- Sincroniza métricas cuando el SDK esté listo (evento + comprobación inmediata) -->
 <script>
   (function () {
     async function syncFromServer(sb, cards) {
@@ -165,7 +159,6 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
           .select('slug,views,likes')
           .in('slug', slugs);
         if (error || !Array.isArray(data)) return;
-
         const map = new Map(data.map(r => [r.slug, r]));
         for (const c of cards) {
           const m = map.get(c.slug);
@@ -186,10 +179,8 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
     }
 
     trySyncNow();
-    if (window.__supabaseReady && typeof window.__supabaseReady.then === 'function') {
-      window.__supabaseReady.then(sb => {
-        if (sb && window.__cardsForSync) syncFromServer(sb, window.__cardsForSync);
-      });
-    }
+    document.addEventListener('supabase:ready', (ev) => {
+      if (ev.detail && window.__cardsForSync) syncFromServer(ev.detail, window.__cardsForSync);
+    }, { once: true });
   })();
 </script>

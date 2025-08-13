@@ -1,44 +1,52 @@
 <!-- start custom footer snippets -->
 
-<!-- Supabase JS loader con fallbacks + Promise global -->
+<!-- Supabase JS loader con fallbacks + Promise global + EVENTO -->
 <script>
-  window.__supabaseReady = new Promise(function (resolve) {
-    function init() {
+  (function () {
+    function fireReady(sb) {
       try {
-        if (!window.__supabase) {
-          window.__supabase = supabase.createClient(
-            '{{ site.supabase_url }}',
-            '{{ site.supabase_anon_key }}'
-          );
-        }
-        resolve(window.__supabase);
-      } catch (e) { console.error('Supabase init error:', e); }
+        document.dispatchEvent(new CustomEvent('supabase:ready', { detail: sb }));
+      } catch (e) {}
     }
-    function inject(src, onload) {
-      var s = document.createElement('script');
-      s.src = src; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
-      s.onload = onload;
-      s.onerror = function () {
-        if (src.includes('jsdelivr')) inject('https://unpkg.com/@supabase/supabase-js@2', init);
-        else if (src.includes('unpkg')) inject('https://cdn.skypack.dev/@supabase/supabase-js@2', init);
-        else console.error('No se pudo cargar @supabase/supabase-js');
-      };
-      document.head.appendChild(s);
-    }
-    if (window.supabase) init();
-    else inject('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', init);
-  });
+    window.__supabaseReady = new Promise(function (resolve) {
+      function init() {
+        try {
+          if (!window.__supabase) {
+            window.__supabase = supabase.createClient(
+              '{{ site.supabase_url }}',
+              '{{ site.supabase_anon_key }}'
+            );
+          }
+          resolve(window.__supabase);
+          fireReady(window.__supabase); // 🔔 avisa SIEMPRE que está listo
+        } catch (e) { console.error('Supabase init error:', e); }
+      }
+      function inject(src, onload) {
+        var s = document.createElement('script');
+        s.src = src; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
+        s.onload = onload;
+        s.onerror = function () {
+          if (src.includes('jsdelivr')) inject('https://unpkg.com/@supabase/supabase-js@2', init);
+          else if (src.includes('unpkg')) inject('https://cdn.skypack.dev/@supabase/supabase-js@2', init);
+          else console.error('No se pudo cargar @supabase/supabase-js');
+        };
+        document.head.appendChild(s);
+      }
+      if (window.supabase) init();
+      else inject('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', init);
+    });
 
-  /* Slug canónico (igual que en Home): minúsculas, sin index.html, con / final */
-  window.__canonicalSlug = function (pathname) {
-    const BASE = '{{ site.baseurl | default: "" }}';
-    let s = pathname || "/";
-    if (BASE && s.startsWith(BASE)) s = s.slice(BASE.length);
-    if (!s.startsWith("/")) s = "/" + s;
-    s = s.replace(/\/index\.html$/i, "/").replace(/\/{2,}/g, "/");
-    if (s !== "/" && !s.endsWith("/")) s += "/";
-    return s.toLowerCase();
-  };
+    /* Slug canónico (igual que en Home/Blog) */
+    window.__canonicalSlug = function (pathname) {
+      const BASE = '{{ site.baseurl | default: "" }}';
+      let s = pathname || "/";
+      if (BASE && s.startsWith(BASE)) s = s.slice(BASE.length);
+      if (!s.startsWith("/")) s = "/" + s;
+      s = s.replace(/\/index\.html$/i, "/").replace(/\/{2,}/g, "/");
+      if (s !== "/" && !s.endsWith("/")) s += "/";
+      return s.toLowerCase();
+    };
+  })();
 </script>
 
 <!-- Code enhanced -->
@@ -47,19 +55,16 @@
 <!-- Code header -->
 <script src="{{ '/assets/js/code-header.js' | relative_url }}"></script>
 
-<!-- Post reads counter (solo servidor, sin pintar UI en el post) -->
+<!-- Post reads counter (solo servidor, sin UI en el post) -->
 <script>
   (function () {
     if (!document.body.classList.contains('layout--single')) return;
     const slug = window.__canonicalSlug(window.location.pathname);
-    // Incrementa 1 vez por sesión/ventana; no hay UI
     try {
       const seen = 'srv_viewed_' + slug;
       if (!sessionStorage.getItem(seen)) {
         sessionStorage.setItem(seen, '1');
-        window.__supabaseReady.then(sb => {
-          sb.rpc('inc_view', { p_slug: slug }).catch(() => {});
-        });
+        window.__supabaseReady.then(sb => sb.rpc('inc_view', { p_slug: slug }).catch(() => {}));
       }
     } catch (e) {}
   })();

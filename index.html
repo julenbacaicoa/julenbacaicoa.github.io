@@ -92,19 +92,14 @@ author_profile: true
 {% endfor %}
 ]
 </script>
-
-<!-- Lo convertimos a objeto JS -->
-<script>
-  const posts = JSON.parse(document.getElementById('posts-data').textContent);
-</script>
+<script>const posts = JSON.parse(document.getElementById('posts-data').textContent);</script>
 
 <!-- Construcción de cards + acciones (pinta primero; sincroniza después) -->
 <script>
-  (async function () {
+  (function () {
     const container = document.getElementById('home-posts');
     if (!container) return;
 
-    // Utilidades
     const BASE = '{{ site.baseurl | default: "" }}';
     function canonicalSlug(pathname) {
       let s = pathname || "/";
@@ -115,12 +110,11 @@ author_profile: true
       return s.toLowerCase();
     }
     function fullUrl(relative) { try { return new URL(relative, location.origin).toString(); } catch { return relative; } }
-    function getLocalCount(key) { const v = localStorage.getItem(key); return v ? parseInt(v, 10) : 0; }
-    function setLocalCount(key, val) { localStorage.setItem(key, String(val)); }
-    function getLikeState(slug) { return localStorage.getItem(`like_state_${slug}`) === '1'; }
-    function setLikeState(slug, liked) { localStorage.setItem(`like_state_${slug}`, liked ? '1' : '0'); }
+    function getLocalCount(k){const v=localStorage.getItem(k);return v?parseInt(v,10):0;}
+    function setLocalCount(k,v){localStorage.setItem(k,String(v));}
+    function getLikeState(slug){return localStorage.getItem(`like_state_${slug}`)==='1';}
+    function setLikeState(slug,b){localStorage.setItem(`like_state_${slug}`, b?'1':'0');}
 
-    // Pinta primero (sin depender del SDK)
     const cards = [];
     posts.forEach(p => {
       const card = document.createElement('article');
@@ -166,40 +160,37 @@ author_profile: true
         <a class="blogcard__fab" href="${p.url}" title="Read"><i class="fa fa-arrow-right"></i></a>
       `;
 
-      const viewsEl   = card.querySelector('[data-role="views"]');
-      const likesEl   = card.querySelector('[data-role="likes"]');
+      const viewsEl = card.querySelector('[data-role="views"]');
+      const likesEl = card.querySelector('[data-role="likes"]');
       const heartIcon = card.querySelector('[data-role="heart"]');
-      const likeBtn   = card.querySelector('.action-like');
+      const likeBtn = card.querySelector('.action-like');
 
-      const slugKeyV = `views_${slug}`;
-      const slugKeyL = `likes_${slug}`;
+      const viewsKey = `views_${slug}`;
+      const likesKey = `likes_${slug}`;
 
-      // Inicial local
-      viewsEl.textContent = getLocalCount(slugKeyV);
-      likesEl.textContent = getLocalCount(slugKeyL);
+      // Inicial local (0 si no hay cache)
+      viewsEl.textContent = getLocalCount(viewsKey);
+      likesEl.textContent = getLocalCount(likesKey);
       if (getLikeState(slug)) heartIcon.classList.add('is-liked');
 
-      // Like toggle (optimista)
+      // Like (optimista) + sync cuando haya SDK
       likeBtn.addEventListener('click', async () => {
         if (likeBtn.disabled) return; likeBtn.disabled = true;
         const was = getLikeState(slug);
         let l = parseInt(likesEl.textContent || '0', 10);
-        if (was) { l = Math.max(0, l - 1); heartIcon.classList.remove('is-liked'); setLikeState(slug, false); }
-        else     { l = l + 1;               heartIcon.classList.add('is-liked');    setLikeState(slug, true);  }
-        setLocalCount(slugKeyL, l);
+        if (was) { l = Math.max(0,l-1); heartIcon.classList.remove('is-liked'); setLikeState(slug,false); }
+        else     { l = l+1;             heartIcon.classList.add('is-liked');    setLikeState(slug,true);  }
+        setLocalCount(likesKey, l);
         likesEl.textContent = l;
 
-        // Sincroniza con servidor cuando esté disponible
         try {
-          const sb = (window.__supabaseReady && typeof window.__supabaseReady.then === 'function')
-            ? await window.__supabaseReady
-            : null;
+          const sb = (window.__supabaseReady && typeof window.__supabaseReady.then==='function') ? await window.__supabaseReady : null;
           if (sb) {
             const delta = was ? -1 : 1;
             const { data, error } = await sb.rpc('add_like', { p_slug: slug, p_delta: delta });
             if (!error && data && typeof data[0]?.likes === 'number') {
               likesEl.textContent = String(data[0].likes);
-              setLocalCount(slugKeyL, data[0].likes);
+              setLocalCount(likesKey, data[0].likes);
             }
           }
         } catch {}
@@ -211,23 +202,20 @@ author_profile: true
       shareBtn.addEventListener('click', async () => {
         try {
           if (navigator.share) await navigator.share({ title: p.title, url: absoluteUrl });
-          else {
-            await navigator.clipboard.writeText(absoluteUrl);
-            shareBtn.title = 'Link copied!'; setTimeout(() => (shareBtn.title = 'Share'), 1200);
-          }
+          else { await navigator.clipboard.writeText(absoluteUrl); shareBtn.title='Link copied!'; setTimeout(()=>shareBtn.title='Share',1200); }
         } catch {}
       });
 
       container.appendChild(card);
-      cards.push({ slug, viewsEl, likesEl, viewsKey: slugKeyV, likesKey: slugKeyL });
+      cards.push({ slug, viewsEl, likesEl, viewsKey, likesKey });
     });
 
-    // Exponer para sincronización eventual
+    // Expón para sincronización eventual
     window.__cardsForSync = cards;
   })();
 </script>
 
-<!-- Sincroniza métricas con Supabase en cuanto esté disponible (eventual, sin timeout) -->
+<!-- Sincroniza métricas cuando el SDK esté listo (evento + comprobación inmediata) -->
 <script>
   (function () {
     async function syncFromServer(sb, cards) {
@@ -239,7 +227,6 @@ author_profile: true
           .select('slug,views,likes')
           .in('slug', slugs);
         if (error || !Array.isArray(data)) return;
-
         const map = new Map(data.map(r => [r.slug, r]));
         for (const c of cards) {
           const m = map.get(c.slug);
@@ -259,13 +246,11 @@ author_profile: true
       }
     }
 
-    // Intenta ya si el cliente existe…
+    // 1) si ya está el cliente, sincroniza
     trySyncNow();
-    // …y también cuando el loader asíncrono termine (aunque tarde)
-    if (window.__supabaseReady && typeof window.__supabaseReady.then === 'function') {
-      window.__supabaseReady.then(sb => {
-        if (sb && window.__cardsForSync) syncFromServer(sb, window.__cardsForSync);
-      });
-    }
+    // 2) cuando el loader emita el evento, sincroniza (aunque cargue tarde)
+    document.addEventListener('supabase:ready', (ev) => {
+      if (ev.detail && window.__cardsForSync) syncFromServer(ev.detail, window.__cardsForSync);
+    }, { once: true });
   })();
 </script>
