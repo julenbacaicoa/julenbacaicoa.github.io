@@ -53,13 +53,15 @@
 <!-- Code header -->
 <script src="{{ '/assets/js/code-header.js' | relative_url }}"></script>
 
-<!-- Post views: incrementa en páginas con x-track-views; con fallback REST y reintento -->
+<!-- Post views: incrementa en páginas con x-track-views; ahora solo marca la sesión si el bump tuvo éxito -->
 <script>
   (function () {
-    const track = document.querySelector('meta[name="x-track-views"][content="1"]');
-    if (!track) return; // no cuentes en home, /blog/, etc.
+    // 1) ¿Esta página debe contar?
+    const isTrack = document.querySelector('meta[name="x-track-views"][content="1"]')
+                   || document.body.classList.contains('layout--single'); // fallback por si falta el meta
+    if (!isTrack) return;
 
-    // Slug desde meta o desde la URL actual; normalizado
+    // 2) Slug canónico (igual que en Home/Blog)
     const BASE = '{{ site.baseurl | default: "" }}';
     function canonicalSlug(pathname) {
       let s = pathname || "/";
@@ -72,14 +74,46 @@
     const raw = (document.querySelector('meta[name="x-post-slug"]') || {}).content || window.location.pathname;
     const slug = canonicalSlug(raw);
 
-    // Throttle por pestaña: 1 vez por sesión (cambia a localStorage + TTL si quieres)
-    const KEY = 'srv_viewed_' + slug;
-    if (sessionStorage.getItem(KEY)) return;
-    sessionStorage.setItem(KEY, '1');
+    // 3) Llaves de control
+    const SESSION_KEY = 'srv_viewed_' + slug;          // evita duplicar en la misma pestaña
+    const TTL_KEY     = 'srv_viewed_ts_' + slug;       // opcional: TTL por dispositivo
+    const TTL_MS      = 0;                              // 0 = desactivado (si quieres 24h: 24*60*60*1000)
 
-    // === Fallback REST por si el SDK se bloquea o tarda ===
-    const SB_URL = '{{ site.supabase_url }}'.replace(/\/+$/, '');         // https://xxx.supabase.co
+    // Si tienes TTL, respétalo (no sumar otra vista hasta que caduque)
+    if (TTL_MS > 0) {
+      const ts = parseInt(localStorage.getItem(TTL_KEY) || '0', 10);
+      if (ts && (Date.now() - ts) < TTL_MS) return;
+    }
+
+    // Si ya contamos en esta pestaña, no repitas
+    if (sessionStorage.getItem(SESSION_KEY)) return;
+
+    // 4) Dos caminos para “bump”: SDK (cuando esté) o REST directo. Solo marcamos la sesión si alguno tiene éxito.
+    const SB_URL = '{{ site.supabase_url }}'.replace(/\/+$/, '');
     const SB_KEY = '{{ site.supabase_anon_key }}';
+
+    async function bumpViaSDK(timeoutMs) {
+      try {
+        const ready = window.__supabase
+          ? Promise.resolve(window.__supabase)
+          : (window.__supabaseReady && window.__supabaseReady);
+
+        if (!ready) return false;
+
+        // timeout suave por si el SDK tarda
+        const sb = await Promise.race([
+          ready,
+          new Promise((_, rej) => setTimeout(() => rej(new Error('sdk-timeout')), timeoutMs || 1800))
+        ]);
+        if (!sb || typeof sb.rpc !== 'function') return false;
+
+        const { error } = await sb.rpc('inc_view', { p_slug: slug });
+        return !error;
+      } catch (_) {
+        return false;
+      }
+    }
+
     async function bumpViaREST() {
       try {
         const res = await fetch(SB_URL + '/rest/v1/rpc/inc_view', {
@@ -91,38 +125,52 @@
           },
           body: JSON.stringify({ p_slug: slug })
         });
-        // 200/201/204 OK. Si hay error de RLS o función, suele dar 4xx con JSON.
         return res.ok;
       } catch (_) {
         return false;
       }
     }
 
-    // === Intento vía SDK si está/estará disponible ===
-    async function bumpViaSDK() {
-      try {
-        const sb = window.__supabase || (window.__supabaseReady && await window.__supabaseReady);
-        if (!sb || typeof sb.rpc !== 'function') return false;
-        const { error } = await sb.rpc('inc_view', { p_slug: slug });
-        return !error;
-      } catch (_) {
-        return false;
-      }
-    }
-
-    // Dispara: primero intenta SDK; si no, REST; reintenta a los 2.5s si hiciera falta
-    (async () => {
-      let ok = await bumpViaSDK();
+    async function tryBump() {
+      // Primero intentamos SDK con timeout corto; si no, REST; si aún falla, reintento tardío.
+      let ok = await bumpViaSDK(1800);
       if (!ok) ok = await bumpViaREST();
 
       if (!ok) {
-        // reintento tardío por si el SDK carga después (iOS/ahorro de datos)
         setTimeout(async () => {
-          let ok2 = await bumpViaSDK();
-          if (!ok2) await bumpViaREST();
+          let ok2 = await bumpViaSDK(1800);
+          if (!ok2) ok2 = await bumpViaREST();
+          if (ok2) afterSuccess();
         }, 2500);
+      } else {
+        afterSuccess();
       }
-    })();
+    }
+
+    function afterSuccess() {
+      sessionStorage.setItem(SESSION_KEY, '1');       // ¡ahora sí! solo si el bump ha funcionado
+      if (TTL_MS > 0) localStorage.setItem(TTL_KEY, String(Date.now()));
+    }
+
+    tryBump();
+
+    // Por si el SDK llega muy tarde y arriba todo falló, escuchamos el evento y volvemos a intentar 1 vez.
+    document.addEventListener('supabase:ready', () => { if (!sessionStorage.getItem(SESSION_KEY)) tryBump(); }, { once: true });
+
+    // Utilidad de depuración (opcional): window.bumpView('/misc/welcome/')
+    window.bumpView = async function (s) {
+      const target = s ? canonicalSlug(s) : slug;
+      const res = await fetch(SB_URL + '/rest/v1/rpc/inc_view', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'apikey': SB_KEY,
+          'authorization': 'Bearer ' + SB_KEY
+        },
+        body: JSON.stringify({ p_slug: target })
+      });
+      console.log('bumpView', target, res.status, await res.text().catch(()=>'')); // ver consola
+    };
   })();
 </script>
 
