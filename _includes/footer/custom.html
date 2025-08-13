@@ -53,25 +53,76 @@
 <!-- Code header -->
 <script src="{{ '/assets/js/code-header.js' | relative_url }}"></script>
 
-<!-- Post views: incrementa SOLO en posts (detecta meta x-is-post) -->
+<!-- Post views: incrementa en páginas con x-track-views; con fallback REST y reintento -->
 <script>
   (function () {
-    const isPost = document.querySelector('meta[name="x-is-post"][content="1"]');
-    if (!isPost) return; // no cuentes en home, blog, páginas...
+    const track = document.querySelector('meta[name="x-track-views"][content="1"]');
+    if (!track) return; // no cuentes en home, /blog/, etc.
 
-    // Slug desde meta (si existe) o desde la URL actual; normalizado
-    const raw = (document.querySelector('meta[name="x-post-slug"]') || {}).content || window.location.pathname;
-    const slug = window.__canonicalSlug(raw);
-
-    // Evita duplicar en la misma pestaña/ventana
-    const KEY = 'srv_viewed_' + slug;
-    if (!sessionStorage.getItem(KEY)) {
-      sessionStorage.setItem(KEY, '1');
-      window.__supabaseReady.then(sb => {
-        sb.rpc('inc_view', { p_slug: slug })
-          .catch(() => { /* silenciar errores de red/RPC */ });
-      });
+    // Slug desde meta o desde la URL actual; normalizado
+    const BASE = '{{ site.baseurl | default: "" }}';
+    function canonicalSlug(pathname) {
+      let s = pathname || "/";
+      if (BASE && s.startsWith(BASE)) s = s.slice(BASE.length);
+      if (!s.startsWith("/")) s = "/" + s;
+      s = s.replace(/\/index\.html$/i, "/").replace(/\/{2,}/g, "/");
+      if (s !== "/" && !s.endsWith("/")) s += "/";
+      return s.toLowerCase();
     }
+    const raw = (document.querySelector('meta[name="x-post-slug"]') || {}).content || window.location.pathname;
+    const slug = canonicalSlug(raw);
+
+    // Throttle por pestaña: 1 vez por sesión (cambia a localStorage + TTL si quieres)
+    const KEY = 'srv_viewed_' + slug;
+    if (sessionStorage.getItem(KEY)) return;
+    sessionStorage.setItem(KEY, '1');
+
+    // === Fallback REST por si el SDK se bloquea o tarda ===
+    const SB_URL = '{{ site.supabase_url }}'.replace(/\/+$/, '');         // https://xxx.supabase.co
+    const SB_KEY = '{{ site.supabase_anon_key }}';
+    async function bumpViaREST() {
+      try {
+        const res = await fetch(SB_URL + '/rest/v1/rpc/inc_view', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'apikey': SB_KEY,
+            'authorization': 'Bearer ' + SB_KEY
+          },
+          body: JSON.stringify({ p_slug: slug })
+        });
+        // 200/201/204 OK. Si hay error de RLS o función, suele dar 4xx con JSON.
+        return res.ok;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    // === Intento vía SDK si está/estará disponible ===
+    async function bumpViaSDK() {
+      try {
+        const sb = window.__supabase || (window.__supabaseReady && await window.__supabaseReady);
+        if (!sb || typeof sb.rpc !== 'function') return false;
+        const { error } = await sb.rpc('inc_view', { p_slug: slug });
+        return !error;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    // Dispara: primero intenta SDK; si no, REST; reintenta a los 2.5s si hiciera falta
+    (async () => {
+      let ok = await bumpViaSDK();
+      if (!ok) ok = await bumpViaREST();
+
+      if (!ok) {
+        // reintento tardío por si el SDK carga después (iOS/ahorro de datos)
+        setTimeout(async () => {
+          let ok2 = await bumpViaSDK();
+          if (!ok2) await bumpViaREST();
+        }, 2500);
+      }
+    })();
   })();
 </script>
 

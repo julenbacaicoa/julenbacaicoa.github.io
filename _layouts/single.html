@@ -28,14 +28,12 @@ layout: default
     {% if page.last_modified_at %}<meta itemprop="dateModified" content="{{ page.last_modified_at | date_to_xmlschema }}">{% endif %}
 
     {%- comment -%}
-      Marcadores para scripts cliente: sólo existirán en posts (page.id existe en posts).
-      x-is-post = "1" → es un post real
-      x-post-slug      → slug original renderizado por Jekyll (lo normalizaremos en el footer)
+      Marcadores para el contador de vistas (siempre presentes en pages con layout: single).
+      x-track-views="1"  → esta página debe contar vistas (post o página).
+      x-post-slug        → slug original; el JS lo normaliza antes de enviar a Supabase.
     {%- endcomment -%}
-    {% if page.id %}
-      <meta name="x-is-post" content="1">
-      <meta name="x-post-slug" content="{{ page.url | relative_url }}">
-    {% endif %}
+    <meta name="x-track-views" content="1">
+    <meta name="x-post-slug" content="{{ page.url | relative_url }}">
 
     <div class="page__inner-wrap">
       {% unless page.header.overlay_color or page.header.overlay_image %}
@@ -80,7 +78,7 @@ layout: default
         {% include comments.html %}
       {% else %}
         <p>
-          Comments are configured with provider: <strong>{{ site.comments.provider }}</strong>,
+          Comments are configured with provider: <strong>{{ page.comments.provider }}</strong>,
           but are disabled in non-production environments.
         </p>
       {% endif %}
