@@ -1,10 +1,10 @@
 <!-- start custom footer snippets -->
 
-<!-- Supabase JS loader con fallbacks + Promise global + EVENTO -->
+<!-- Supabase JS loader + Promise global + evento -->
 <script>
   (function () {
     function fireReady(sb) {
-      try { document.dispatchEvent(new CustomEvent('supabase:ready', { detail: sb })); } catch (e) {}
+      try { document.dispatchEvent(new CustomEvent('supabase:ready', { detail: sb })); } catch {}
     }
     window.__supabaseReady = new Promise(function (resolve) {
       function init() {
@@ -34,14 +34,13 @@
       else inject('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', init);
     });
 
-    /* Slug canónico compartido */
+    /* Slug canónico robusto (global) */
     window.__canonicalSlug = function (pathname) {
-      const BASE = '{{ site.baseurl | default: "" }}';
-      let s = pathname || "/";
-      if (BASE && s.startsWith(BASE)) s = s.slice(BASE.length);
-      if (!s.startsWith("/")) s = "/" + s;
-      s = s.replace(/\/index\.html$/i, "/").replace(/\/{2,}/g, "/");
-      if (s !== "/" && !s.endsWith("/")) s += "/";
+      let s;
+      try { s = new URL(pathname || '/', location.origin).pathname; }
+      catch { s = pathname || '/'; }
+      s = s.replace(/\/index\.html$/i,'/').replace(/\/{2,}/g,'/');
+      if (s !== '/' && !s.endsWith('/')) s += '/';
       return s.toLowerCase();
     };
   })();
@@ -53,69 +52,59 @@
 <!-- Code header -->
 <script src="{{ '/assets/js/code-header.js' | relative_url }}"></script>
 
-<!-- Post views: incrementa en páginas con x-track-views; ahora solo marca la sesión si el bump tuvo éxito -->
+<!-- Post views: cuenta vistas en páginas con x-track-views; SDK + REST + reintento; debug y helper -->
 <script>
   (function () {
-    // 1) ¿Esta página debe contar?
+    const DEBUG = /[?&]debug=views\b/.test(location.search);
+
     const isTrack = document.querySelector('meta[name="x-track-views"][content="1"]')
-                   || document.body.classList.contains('layout--single'); // fallback por si falta el meta
+                   || document.body.classList.contains('layout--single'); // fallback
     if (!isTrack) return;
 
-    // 2) Slug canónico (igual que en Home/Blog)
-    const BASE = '{{ site.baseurl | default: "" }}';
-    function canonicalSlug(pathname) {
-      let s = pathname || "/";
-      if (BASE && s.startsWith(BASE)) s = s.slice(BASE.length);
-      if (!s.startsWith("/")) s = "/" + s;
-      s = s.replace(/\/index\.html$/i, "/").replace(/\/{2,}/g, "/");
-      if (s !== "/" && !s.endsWith("/")) s += "/";
-      return s.toLowerCase();
-    }
-    const raw = (document.querySelector('meta[name="x-post-slug"]') || {}).content || window.location.pathname;
-    const slug = canonicalSlug(raw);
-
-    // 3) Llaves de control
-    const SESSION_KEY = 'srv_viewed_' + slug;          // evita duplicar en la misma pestaña
-    const TTL_KEY     = 'srv_viewed_ts_' + slug;       // opcional: TTL por dispositivo
-    const TTL_MS      = 0;                              // 0 = desactivado (si quieres 24h: 24*60*60*1000)
-
-    // Si tienes TTL, respétalo (no sumar otra vista hasta que caduque)
-    if (TTL_MS > 0) {
-      const ts = parseInt(localStorage.getItem(TTL_KEY) || '0', 10);
-      if (ts && (Date.now() - ts) < TTL_MS) return;
+    // Debug badge
+    let badge;
+    function say(msg) {
+      if (!DEBUG) return;
+      console.log('[views]', msg);
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.style = 'position:fixed;bottom:12px;right:12px;background:#111;color:#0f0;padding:8px 10px;border-radius:8px;font:12px/1.2 monospace;z-index:99999;opacity:.9';
+        document.body.appendChild(badge);
+      }
+      badge.textContent = String(msg);
     }
 
-    // Si ya contamos en esta pestaña, no repitas
-    if (sessionStorage.getItem(SESSION_KEY)) return;
+    const raw  = (document.querySelector('meta[name="x-post-slug"]') || {}).content || location.pathname;
+    const slug = window.__canonicalSlug(raw);
 
-    // 4) Dos caminos para “bump”: SDK (cuando esté) o REST directo. Solo marcamos la sesión si alguno tiene éxito.
+    // Evita duplicar en la misma pestaña: solo marcamos tras éxito
+    const SESSION_KEY = 'srv_viewed_' + slug;
+    if (sessionStorage.getItem(SESSION_KEY)) { say('ya contado esta pestaña'); return; }
+
     const SB_URL = '{{ site.supabase_url }}'.replace(/\/+$/, '');
     const SB_KEY = '{{ site.supabase_anon_key }}';
 
-    async function bumpViaSDK(timeoutMs) {
+    async function bumpViaSDK(ms) {
       try {
-        const ready = window.__supabase
-          ? Promise.resolve(window.__supabase)
-          : (window.__supabaseReady && window.__supabaseReady);
-
+        say('SDK…');
+        const ready = window.__supabase ? Promise.resolve(window.__supabase)
+                    : (window.__supabaseReady && window.__supabaseReady);
         if (!ready) return false;
-
-        // timeout suave por si el SDK tarda
         const sb = await Promise.race([
           ready,
-          new Promise((_, rej) => setTimeout(() => rej(new Error('sdk-timeout')), timeoutMs || 1800))
+          new Promise((_, r) => setTimeout(() => r(new Error('sdk-timeout')), ms || 1800))
         ]);
         if (!sb || typeof sb.rpc !== 'function') return false;
-
         const { error } = await sb.rpc('inc_view', { p_slug: slug });
-        return !error;
-      } catch (_) {
-        return false;
-      }
+        if (error) { say('SDK error'); return false; }
+        say('SDK OK');
+        return true;
+      } catch { return false; }
     }
 
     async function bumpViaREST() {
       try {
+        say('REST…');
         const res = await fetch(SB_URL + '/rest/v1/rpc/inc_view', {
           method: 'POST',
           headers: {
@@ -125,41 +114,40 @@
           },
           body: JSON.stringify({ p_slug: slug })
         });
+        say('REST status ' + res.status);
         return res.ok;
-      } catch (_) {
-        return false;
-      }
+      } catch { return false; }
+    }
+
+    function afterSuccess() {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      say('SUCCESS');
     }
 
     async function tryBump() {
-      // Primero intentamos SDK con timeout corto; si no, REST; si aún falla, reintento tardío.
+      say('slug ' + slug);
       let ok = await bumpViaSDK(1800);
       if (!ok) ok = await bumpViaREST();
-
       if (!ok) {
+        say('reintento en 2.5s…');
         setTimeout(async () => {
           let ok2 = await bumpViaSDK(1800);
           if (!ok2) ok2 = await bumpViaREST();
-          if (ok2) afterSuccess();
+          if (ok2) afterSuccess(); else say('falló todo');
         }, 2500);
       } else {
         afterSuccess();
       }
     }
 
-    function afterSuccess() {
-      sessionStorage.setItem(SESSION_KEY, '1');       // ¡ahora sí! solo si el bump ha funcionado
-      if (TTL_MS > 0) localStorage.setItem(TTL_KEY, String(Date.now()));
-    }
-
     tryBump();
+    document.addEventListener('supabase:ready', () => {
+      if (!sessionStorage.getItem(SESSION_KEY)) { say('ready event → retry'); tryBump(); }
+    }, { once: true });
 
-    // Por si el SDK llega muy tarde y arriba todo falló, escuchamos el evento y volvemos a intentar 1 vez.
-    document.addEventListener('supabase:ready', () => { if (!sessionStorage.getItem(SESSION_KEY)) tryBump(); }, { once: true });
-
-    // Utilidad de depuración (opcional): window.bumpView('/misc/welcome/')
+    // Helper de depuración: puedes llamar window.bumpView('/misc/welcome/')
     window.bumpView = async function (s) {
-      const target = s ? canonicalSlug(s) : slug;
+      const target = window.__canonicalSlug(s || slug);
       const res = await fetch(SB_URL + '/rest/v1/rpc/inc_view', {
         method: 'POST',
         headers: {
@@ -169,7 +157,9 @@
         },
         body: JSON.stringify({ p_slug: target })
       });
-      console.log('bumpView', target, res.status, await res.text().catch(()=>'')); // ver consola
+      const txt = await res.text().catch(()=>'');
+      console.log('bumpView', target, res.status, txt);
+      return res.status;
     };
   })();
 </script>
