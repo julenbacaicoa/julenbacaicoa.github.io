@@ -16,60 +16,233 @@ author_profile: true
 </div>
 
 <div class="quick-links-grid fixed-layout">
-    <a href="/blog/" class="quick-link-card">
-      <div class="icon">🧠</div>
-      <h4>Blog</h4>
-      <p>Short thoughts, tutorials, and deep dives on tech and science.</p>
-    </a>
-    <a href="/projects/" class="quick-link-card">
-      <div class="icon">🚀</div>
-      <h4>Projects</h4>
-      <p>Explore hands-on work and technical challenges I’ve tackled.</p>
-    </a>
-    <a href="/papers/" class="quick-link-card">
-      <div class="icon">📄</div>
-      <h4>Papers</h4>
-      <p>Browse academic publications and research findings.</p>
-    </a>
-    <a href="/talks/" class="quick-link-card">
-      <div class="icon">🎤</div>
-      <h4>Talks</h4>
-      <p>Highlights from conferences, lectures, and invited talks.</p>
-    </a>
-    <a href="/teaching/" class="quick-link-card">
-      <div class="icon">🎓</div>
-      <h4>Teaching</h4>
-      <p>Discover the courses I teach and topics I cover in class.</p>
-    </a>
-    <a href="/about/" class="quick-link-card">
-      <div class="icon">👨🏻‍💻</div>
-      <h4>About Me</h4>
-      <p>Get to know my background, interests, and what drives me.</p>
-    </a>
-  </div>
+  <a href="/blog/" class="quick-link-card">
+    <div class="icon">🧠</div>
+    <h4>Blog</h4>
+    <p>Short thoughts, tutorials, and deep dives on tech and science.</p>
+  </a>
+  <a href="/projects/" class="quick-link-card">
+    <div class="icon">🚀</div>
+    <h4>Projects</h4>
+    <p>Explore hands-on work and technical challenges I’ve tackled.</p>
+  </a>
+  <a href="/papers/" class="quick-link-card">
+    <div class="icon">📄</div>
+    <h4>Papers</h4>
+    <p>Browse academic publications and research findings.</p>
+  </a>
+  <a href="/talks/" class="quick-link-card">
+    <div class="icon">🎤</div>
+    <h4>Talks</h4>
+    <p>Highlights from conferences, lectures, and invited talks.</p>
+  </a>
+  <a href="/teaching/" class="quick-link-card">
+    <div class="icon">🎓</div>
+    <h4>Teaching</h4>
+    <p>Discover the courses I teach and topics I cover in class.</p>
+  </a>
+  <a href="/about/" class="quick-link-card">
+    <div class="icon">👨🏻‍💻</div>
+    <h4>About Me</h4>
+    <p>Get to know my background, interests, and what drives me.</p>
+  </a>
+</div>
+
+<!-- Contenedor donde insertamos las cards de posts -->
+<section id="home-posts" class="home-cards"></section>
 
 <script>
-  const messages = [
-    "Welcome to my personal corner on the web — a space where curiosity meets engineering. Here you'll find a curated mix of research, teaching, and code projects that reflect my passion for understanding how things move, connect, and evolve.",
-    
-    "This portfolio is more than just a collection of achievements. It's a playground of ideas, experiments, and shared learning. Whether you're a fellow researcher, a student, or just curious — I'm glad you're here. Dive in and explore!",
+  // Mensajes rotatorios de bienvenida
+  (function () {
+    const messages = [
+      "Welcome to my personal corner on the web — a space where curiosity meets engineering. Here you'll find a curated mix of research, teaching, and code projects that reflect my passion for understanding how things move, connect, and evolve.",
+      "This portfolio is more than just a collection of achievements. It's a playground of ideas, experiments, and shared learning. Whether you're a fellow researcher, a student, or just curious — I'm glad you're here. Dive in and explore!",
+      "Science, code, and curiosity — these are the three pillars that guide my work. I believe in asking bold questions, building things from scratch, and turning complexity into something meaningful and beautiful.",
+      "Feel free to look around, check out the papers and projects, or read some thoughts I've shared in blog posts. And if something catches your eye, don’t hesitate to reach out — I’m always open to exchanging ideas.",
+      "Thanks for visiting! I hope this space sparks inspiration, invites you to learn something new, or just gives you a glimpse into the kind of work that excites me most. Let the exploration begin."
+    ];
+    let i = 1;
+    const msg = document.getElementById("welcome-msg");
+    setInterval(() => {
+      msg.classList.add("welcome-fade-out");
+      setTimeout(() => {
+        msg.textContent = messages[i];
+        msg.classList.remove("welcome-fade-out");
+        i = (i + 1) % messages.length;
+      }, 500);
+    }, 10000);
+  })();
+</script>
 
-    "Science, code, and curiosity — these are the three pillars that guide my work. I believe in asking bold questions, building things from scratch, and turning complexity into something meaningful and beautiful.",
-
-    "Feel free to look around, check out the papers and projects, or read some thoughts I've shared in blog posts. And if something catches your eye, don’t hesitate to reach out — I’m always open to exchanging ideas.",
-
-    "Thanks for visiting! I hope this space sparks inspiration, invites you to learn something new, or just gives you a glimpse into the kind of work that excites me most. Let the exploration begin."
+<!-- Inyectamos datos de posts desde Jekyll -->
+<script>
+  const posts = [
+    {% for post in site.posts %}
+    {
+      url: "{{ post.url | relative_url }}",
+      title: {{ post.title | jsonify }},
+      excerpt: {{ post.excerpt | strip_html | strip_newlines | truncate: 220 | jsonify }},
+      image: "{{ post.header.teaser | default: post.image | default: site.teaser | relative_url }}",
+      author: {{ site.author.name | jsonify }},
+      avatar: "{{ site.author.avatar | relative_url }}",
+      day: "{{ post.date | date: '%d' }}",
+      month: "{{ post.date | date: '%B' | upcase }}",
+      year: "{{ post.date | date: '%Y' }}"
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
   ];
+</script>
 
-  let i = 1;
-  const msg = document.getElementById("welcome-msg");
+<!-- Construcción de cards + acciones (views readonly / like / share) -->
+<script>
+  (async function () {
+    const container = document.getElementById('home-posts');
+    if (!container) return;
 
-  setInterval(() => {
-    msg.classList.add("welcome-fade-out");
-    setTimeout(() => {
-      msg.textContent = messages[i];
-      msg.classList.remove("welcome-fade-out");
-      i = (i + 1) % messages.length;
-    }, 500);
-  }, 10000); // más tiempo para leer
+    const sb = window.__supabase;
+
+    function fullUrl(relative) {
+      try { return new URL(relative, window.location.origin).toString(); }
+      catch (e) { return relative; }
+    }
+    function getLocalCount(key) {
+      const v = localStorage.getItem(key);
+      return v ? parseInt(v, 10) : 0;
+    }
+    function setLocalCount(key, val) {
+      localStorage.setItem(key, String(val));
+    }
+    function getLikeState(url) {
+      return localStorage.getItem(`like_state_${url}`) === '1';
+    }
+    function setLikeState(url, liked) {
+      localStorage.setItem(`like_state_${url}`, liked ? '1' : '0');
+    }
+
+    // 1) Trae métricas de Supabase en bloque
+    let metrics = new Map();
+    try {
+      const slugs = posts.map(p => p.url);
+      const { data, error } = await sb
+        .from('post_metrics')
+        .select('slug,views,likes')
+        .in('slug', slugs);
+      if (!error && Array.isArray(data)) {
+        metrics = new Map(data.map(r => [r.slug, r]));
+      }
+    } catch (e) {}
+
+    // 2) Construye cada card
+    posts.forEach(p => {
+      const card = document.createElement('article');
+      card.className = 'blogcard';
+
+      const imgUrl = p.image && p.image !== "{{ '' | relative_url }}" ? p.image : "/assets/images/placeholder-940x540.png";
+      const absoluteUrl = fullUrl(p.url);
+
+      card.innerHTML = `
+        <div class="blogcard__thumb">
+          <img src="${imgUrl}" alt="">
+        </div>
+        <div class="blogcard__body">
+          <h1 class="blogcard__title"><a href="${p.url}">${p.title}</a></h1>
+          <div class="blogcard__author">
+            <img src="${p.avatar}" alt="${p.author}">
+            <span class="blogcard__author-name">${p.author}</span>
+          </div>
+          <div class="blogcard__sep"></div>
+          <p class="blogcard__excerpt">${p.excerpt}</p>
+        </div>
+
+        <div class="blogcard__date">
+          <span class="day">${p.day}</span>
+          <span class="mon">${p.month}</span>
+          <span class="year">${p.year}</span>
+        </div>
+
+        <ul class="blogcard__actions">
+          <li>
+            <span class="action action-view action--readonly" title="Views">
+              <i class="fa fa-eye"></i> <span class="count" data-role="views">0</span>
+            </span>
+          </li>
+          <li>
+            <button class="action action-like" type="button" title="Like">
+              <i class="fa fa-heart" data-role="heart"></i> <span class="count" data-role="likes">0</span>
+            </button>
+          </li>
+          <li>
+            <button class="action action-share" type="button" title="Share">
+              <i class="fa fa-share-alt"></i>
+            </button>
+          </li>
+        </ul>
+
+        <a class="blogcard__fab" href="${p.url}" title="Read">
+          <i class="fa fa-arrow-right"></i>
+        </a>
+      `;
+
+      // Estado inicial (server primero, fallback a local)
+      const viewsKey   = `views_${p.url}`;
+      const likesKey   = `likes_${p.url}`;
+      const viewsEl    = card.querySelector('[data-role="views"]');
+      const likesEl    = card.querySelector('[data-role="likes"]');
+      const heartIcon  = card.querySelector('[data-role="heart"]');
+
+      const m = metrics.get(p.url);
+      const serverViews = m?.views ?? null;
+      const serverLikes = m?.likes ?? null;
+
+      const currentViews = serverViews ?? getLocalCount(viewsKey);
+      const currentLikes = serverLikes ?? getLocalCount(likesKey);
+      const liked        = getLikeState(p.url);
+
+      if (viewsEl) viewsEl.textContent = currentViews;
+      if (likesEl) likesEl.textContent = currentLikes;
+
+      if (liked) heartIcon.classList.add('is-liked');
+
+      // Like: toggle local + Supabase (+1 / -1)
+      const likeBtn = card.querySelector('.action-like');
+      likeBtn.addEventListener('click', async () => {
+        const isLiked = getLikeState(p.url);
+        let l = parseInt(likesEl.textContent || '0', 10);
+
+        if (isLiked) {
+          l = Math.max(0, l - 1);
+          heartIcon.classList.remove('is-liked');
+          setLikeState(p.url, false);
+          setLocalCount(likesKey, l);
+          likesEl.textContent = l;
+          // servidor
+          try { await sb.rpc('add_like', { p_slug: p.url, p_delta: -1 }); } catch (e) {}
+        } else {
+          l = l + 1;
+          heartIcon.classList.add('is-liked');
+          setLikeState(p.url, true);
+          setLocalCount(likesKey, l);
+          likesEl.textContent = l;
+          // servidor
+          try { await sb.rpc('add_like', { p_slug: p.url, p_delta: 1 }); } catch (e) {}
+        }
+      });
+
+      // Compartir (igual que ya tenías)
+      const shareBtn = card.querySelector('.action-share');
+      shareBtn.addEventListener('click', async () => {
+        try {
+          if (navigator.share) {
+            await navigator.share({ title: p.title, url: absoluteUrl });
+          } else {
+            await navigator.clipboard.writeText(absoluteUrl);
+            shareBtn.title = 'Link copied!';
+            setTimeout(() => (shareBtn.title = 'Share'), 1200);
+          }
+        } catch (e) {}
+      });
+
+      container.appendChild(card);
+    });
+  })();
 </script>

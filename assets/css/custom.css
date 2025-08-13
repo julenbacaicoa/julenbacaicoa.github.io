@@ -1,769 +1,258 @@
 /* ─────────────────────────────────────────────
    TIMELINE (línea de tiempo vertical)
 ────────────────────────────────────────────── */
-.timeline {
-  position: relative;
-  max-width: 100%;
-  width: auto;
-  margin: 0 auto;
-}
-
-.timeline::after {
-  content: '';
-  position: absolute;
-  width: 6px;
-  background-color: #ccc;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  margin-left: -3px;
-}
+.timeline { position: relative; max-width: 100%; width: auto; margin: 0 auto; }
+.timeline::after { content: ''; position: absolute; width: 6px; background-color: #ccc; top: 0; bottom: 0; left: 50%; margin-left: -3px; }
 
 /* ─────────────────────────────────────────────
    TIMELINE: contenedores de elementos
 ────────────────────────────────────────────── */
-.container {
-  padding: 10px 40px;
-  position: relative;
-  width: 50%;
-}
-
-.container.left {
-  left: 0;
-}
-
-.container.right {
-  left: 50%;
-}
-
-.container::before {
-  content: '';
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  top: 20px;
-  background-color: #6200ea;
-  border: 4px solid white;
-  border-radius: 50%;
-  z-index: 1;
-}
-
-.container.left::before {
-  right: -12px;
-}
-
-.container.right::before {
-  left: -12px;
-}
+.container { padding: 10px 40px; position: relative; width: 50%; }
+.container.left { left: 0; }
+.container.right { left: 50%; }
+.container::before { content: ''; position: absolute; width: 16px; height: 16px; top: 20px; background-color: #6200ea; border: 4px solid white; border-radius: 50%; z-index: 1; }
+.container.left::before { right: -12px; }
+.container.right::before { left: -12px; }
 
 /* ─────────────────────────────────────────────
    CONTENIDO ENVOLVENTE
 ────────────────────────────────────────────── */
-.content {
-  padding: 20px;
-  background-color: white;
-  position: relative;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+.content { padding: 20px; background-color: white; position: relative; border-radius: 6px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
 
 /* ─────────────────────────────────────────────
    LAYOUT: ajuste de anchos para páginas específicas
 ────────────────────────────────────────────── */
-
-/* Para páginas con layout: single */
-/* Estilo general para pantallas grandes */
-.layout--single .page__inner-wrap {
-  max-width: 1200px;
-  width: 150%;
-  margin: 0 auto;
-  padding: 0 2rem;
-  box-sizing: border-box;
-  transform: translateX(-50px);
-}
-
-/* En pantallas pequeñas (menores a 768px), ajustar a 100% */
-@media (max-width: 767px) {
-  .layout--single .page__inner-wrap {
-    width: 100% !important;
-    transform: none !important;
-    padding: 0 1rem !important;
-  }
-}
-
-.layout--single .page__content {
-  width: 100% !important;
-  text-align: justify;
-  text-justify: inter-word; /* para mejor justificación */
-}
-
-/* Para página de inicio
-   (NOTA: eliminamos limitaciones de .initial-content y #main para no encajonar el hero)
-*/
- /* (Regla anterior eliminada a propósito)
- .layout--home .page {
-   max-width: 1400px !important;
-   width: 100% !important;
-   margin: 0 auto !important;
-   padding: 0 2rem !important;
-   box-sizing: border-box;
- }
-*/
+.layout--single .page__inner-wrap { max-width: 1200px; width: 150%; margin: 0 auto; padding: 0 2rem; box-sizing: border-box; transform: translateX(-50px); }
+@media (max-width: 767px) { .layout--single .page__inner-wrap { width: 100% !important; transform: none !important; padding: 0 1rem !important; } }
+.layout--single .page__content { width: 100% !important; text-align: justify; text-justify: inter-word; }
 
 /* ─────────────────────────────────────────────
    BLOQUE DE BIENVENIDA
 ────────────────────────────────────────────── */
-.home-welcome-box {
-  max-width: 100%;
-  margin-bottom: 2rem;
-}
-
-.welcome-box {
-  background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
-  border-left: 6px solid #30e3ca;
-  border-radius: 12px;
-  padding: 1.8rem 2.2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  font-family: 'Open Sans', sans-serif;
-  animation: fadeIn 1s ease-out;
-  position: relative;
-  overflow: hidden;
-}
-
-.welcome-box::before {
-  content: "✨";
-  position: absolute;
-  top: 16px;
-  right: 20px;
-  font-size: 1.6rem;
-  opacity: 0.4;
-}
-
-.welcome-box h2 {
-  font-size: 1rem;
-  margin-bottom: 0.6rem;
-  color: #2c3e50;
-}
-
-.welcome-box p {
-  font-size: 0.75rem;
-  line-height: 1.7;
-  color: #34495e;
-}
-
-#welcome-msg {
-  transition: opacity 0.5s ease-in-out;
-  opacity: 1;
-}
-
-.welcome-fade-out {
-  opacity: 0;
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+.home-welcome-box { max-width: 100%; margin-bottom: 2rem; }
+.welcome-box { background: linear-gradient(135deg, #f0f4ff, #e8f0fe); border-left: 6px solid #30e3ca; border-radius: 12px; padding: 1.8rem 2.2rem; margin-bottom: 2rem; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); font-family: 'Open Sans', sans-serif; animation: fadeIn 1s ease-out; position: relative; overflow: hidden; }
+.welcome-box::before { content: "✨"; position: absolute; top: 16px; right: 20px; font-size: 1.6rem; opacity: 0.4; }
+.welcome-box h2 { font-size: 1rem; margin-bottom: 0.6rem; color: #2c3e50; }
+.welcome-box p { font-size: 0.75rem; line-height: 1.7; color: #34495e; }
+#welcome-msg { transition: opacity 0.5s ease-in-out; opacity: 1; }
+.welcome-fade-out { opacity: 0; }
+@keyframes fadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
 
 /* ─────────────────────────────────────────────
    METADATOS DE POSTS (fecha, etiquetas, etc.)
 ────────────────────────────────────────────── */
-.blog-date {
-  font-size: 0.85rem;
-  color: #888;
-  margin-bottom: 0.3rem;
-}
-
-.post-categories {
-  font-size: 0.85rem;
-  color: #444;
-  margin-bottom: 0.3rem;
-}
-
-.post-tags {
-  margin-bottom: 0.5rem;
-}
-
-.tag-badge {
-  display: inline-block;
-  background: #e6f0ff;
-  color: #007acc;
-  font-size: 0.75rem;
-  padding: 3px 7px;
-  border-radius: 4px;
-  margin-right: 5px;
-}
+.blog-date { font-size: 0.85rem; color: #888; margin-bottom: 0.3rem; }
+.post-categories { font-size: 0.85rem; color: #444; margin-bottom: 0.3rem; }
+.post-tags { margin-bottom: 0.5rem; }
+.tag-badge { display: inline-block; background: #e6f0ff; color: #007acc; font-size: 0.75rem; padding: 3px 7px; border-radius: 4px; margin-right: 5px; }
 
 /* ─────────────────────────────────────────────
    CATEGORÍAS Y TAGS EN ARCHIVOS
 ────────────────────────────────────────────── */
-.archive__item-categories a,
-.archive__item-tags a,
-.archive__item-tag,
-.archive__item-category {
-  background-color: #eef3ff;
-  color: #1a73e8 !important;
-  padding: 2px 6px;
-  margin: 2px 4px 0 0;
-  border-radius: 4px;
-  display: inline-block;
-  text-decoration: none;
-  font-size: 0.5rem;
+.archive__item-categories a, .archive__item-tags a, .archive__item-tag, .archive__item-category {
+  background-color: #eef3ff; color: #1a73e8 !important; padding: 2px 6px; margin: 2px 4px 0 0; border-radius: 4px; display: inline-block; text-decoration: none; font-size: 0.5rem;
 }
-
-.archive__item-categories a:visited,
-.archive__item-tags a:visited {
-  color: #1a73e8 !important;
-}
+.archive__item-categories a:visited, .archive__item-tags a:visited { color: #1a73e8 !important; }
 
 /* ─────────────────────────────────────────────
    ARCHIVO DE POSTS - CONTENIDO Y FORMATO
 ────────────────────────────────────────────── */
-
-/* Fecha debajo del título del post */
-.archive__item-date {
-  font-size: 0.75rem;
-  color: #666;
-  margin-bottom: 0.5rem;
-  font-style: italic;
-}
-
-/* Título del post con color personalizado */
-.archive__item-title a {
-  color: #30e3ca;
-  text-decoration: none;
-}
-
-.archive__item-title a:hover {
-  color: #1db5a0;
-  text-decoration: underline;
-}
-
-/* Imagen de preview del post */
-.archive__item-teaser img {
-  max-width: 40%;
-  height: auto;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-}
-
-/* Imagen en miniatura dentro del post */
-.excerpt-thumb {
-  width: 100px;
-  height: auto;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  object-fit: cover;
-  display: block;
-}
+.archive__item-date { font-size: 0.75rem; color: #666; margin-bottom: 0.5rem; font-style: italic; }
+.archive__item-title a { color: #30e3ca; text-decoration: none; }
+.archive__item-title a:hover { color: #1db5a0; text-decoration: underline; }
+.archive__item-teaser img { max-width: 40%; height: auto; border-radius: 6px; margin-bottom: 1rem; }
+.excerpt-thumb { width: 100px; height: auto; border-radius: 6px; margin-bottom: 1rem; object-fit: cover; display: block; }
 
 /* ─────────────────────────────────────────────
    BLOQUES DE INFORMACIÓN / OVERVIEW
 ────────────────────────────────────────────── */
-.overview-box {
-  background: #f8f9fa;
-  border-left: 4px solid #3498db;
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  margin: 2rem 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.overview-box h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
-
-.overview-box ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.overview-box li {
-  margin: 0.5rem 0;
-  font-size: 0.95rem;
-}
-
-.overview-box a {
-  text-decoration: none;
-  color: #007acc;
-}
-
-.overview-box a:hover {
-  text-decoration: underline;
-}
+.overview-box { background: #f8f9fa; border-left: 4px solid #3498db; padding: 1rem 1.5rem; border-radius: 8px; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.overview-box h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+.overview-box ul { list-style: none; padding: 0; margin: 0; }
+.overview-box li { margin: 0.5rem 0; font-size: 0.95rem; }
+.overview-box a { text-decoration: none; color: #007acc; }
+.overview-box a:hover { text-decoration: underline; }
 
 /* ─────────────────────────────────────────────
    TARJETAS DE ENLACES RÁPIDOS (HOME)
 ────────────────────────────────────────────── */
-.quick-links-grid.fixed-layout {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin: 2.5rem 0;
-}
-
+.quick-links-grid.fixed-layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2.5rem 0; }
 .quick-link-card {
-  background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
-  border-left: 5px solid #30e3ca;
-  border-radius: 10px;
-  padding: 0.8rem;
-  text-align: center;
-  text-decoration: none;
-  color: #2c3e50;
-  font-family: 'Open Sans', sans-serif;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  background: linear-gradient(135deg, #f0f4ff, #e8f0fe); border-left: 5px solid #30e3ca; border-radius: 10px;
+  padding: 0.8rem; text-align: center; text-decoration: none; color: #2c3e50;
+  font-family: 'Open Sans', sans-serif; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: 180px; display: flex; flex-direction: column; justify-content: center;
 }
-
-.quick-link-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-}
-
-.quick-link-card .icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.4rem;
-}
-
-.quick-link-card h4 {
-  margin: 0.2rem 0;
-  font-size: 0.9rem;
-  color: #2c3e50;
-}
-
-.quick-link-card p {
-  font-size: 0.72rem;
-  color: #444;
-  line-height: 1.4;
-}
-
-/* Responsive: tarjetas en pantallas pequeñas y móviles */
+.quick-link-card:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08); }
+.quick-link-card .icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+.quick-link-card h4 { margin: 0.2rem 0; font-size: 0.9rem; color: #2c3e50; }
+.quick-link-card p { font-size: 0.72rem; color: #444; line-height: 1.4; }
 @media (max-width: 768px) {
-  .quick-links-grid.fixed-layout {
-    grid-template-columns: repeat(2, 1fr); /* SIEMPRE 2 columnas en <=768px */
-    gap: 0.8rem;
-    padding: 0 1rem;
-  }
-
-  .quick-link-card {
-    padding: 0.8rem 1rem;
-    min-height: 140px;
-    font-size: 0.9rem;
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-  }
-
-  .quick-link-card .icon {
-    font-size: 1.4rem;
-    margin-bottom: 0.2rem;
-  }
-
-  .quick-link-card h4 {
-    font-size: 1rem;
-    margin: 0.3rem 0;
-  }
-
-  .quick-link-card p {
-    font-size: 0.78rem;
-  }
+  .quick-links-grid.fixed-layout { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; padding: 0 1rem; }
+  .quick-link-card { padding: 0.8rem 1rem; min-height: 140px; font-size: 0.9rem; width: 100%; max-width: 100%; margin: 0 auto; }
+  .quick-link-card .icon { font-size: 1.4rem; margin-bottom: 0.2rem; }
+  .quick-link-card h4 { font-size: 1rem; margin: 0.3rem 0; }
+  .quick-link-card p { font-size: 0.78rem; }
 }
 
 /* ─────────────────────────────────────────────
-   AJUSTE DE MÁRGEN SUPERIOR PARA TÍTULOS DE PÁGINA
+   AJUSTE DE MÁRGEN SUPERIOR PARA TÍTULOS
 ────────────────────────────────────────────── */
-.page .page__title {
-  margin-top: 1rem !important;  /* Puedes ajustar a 0.5rem o 0 si lo quieres más pegado */
-}
+.page .page__title { margin-top: 1rem !important; }
 
 /* ─────────────────────────────────────────────
-   CODE BLOCKS — estilo global formal y funcional
+   CODE BLOCKS — estilo global
 ────────────────────────────────────────────── */
-/* === CODE BLOCKS con título y botón === */
-.code-block {
-  background-color: #323232;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  margin: 2rem auto;
-  max-width: 960px;
-  overflow: hidden;
-}
+.code-block { background-color: #323232; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); margin: 2rem auto; max-width: 960px; overflow: hidden; }
+.code-header { background-color: #2a2a2a; color: #ccc; font-family: 'Fira Code', monospace; font-size: 0.8rem; padding: 0.4rem 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+.copy-btn { background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #ccc; font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; cursor: pointer; }
+.copy-btn:hover { background: rgba(255,255,255,0.06); }
+.code-block pre { margin: 0; padding: 0.75rem 1rem; font-size: 13px; font-family: 'Fira Code', monospace; color: #e0e0e0; overflow-x: auto; background: transparent; }
 
-.code-header {
-  background-color: #2a2a2a;
-  color: #ccc;
-  font-family: 'Fira Code', monospace;
-  font-size: 0.8rem;
-  padding: 0.4rem 0.75rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.copy-btn {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.15);
-  color: #ccc;
-  font-size: 0.75rem;
-  padding: 2px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.copy-btn:hover {
-  background: rgba(255,255,255,0.06);
-}
-
-.code-block pre {
-  margin: 0;
-  padding: 0.75rem 1rem;
-  font-size: 13px;
-  font-family: 'Fira Code', monospace;
-  color: #e0e0e0;
-  overflow-x: auto;
-  background: transparent;
-}
-
-/* ===== Code blocks (Rouge) con barra + Copy, estilo sobrio ===== */
-:root{
-  --cb-bg: #323232;         /* fondo del bloque */
-  --cb-header: #2a2a2a;     /* fondo de la barra superior */
-  --cb-border: rgba(255,255,255,0.10);
-  --cb-fg: #e0e0e0;         /* color texto del código */
-  --cb-muted: #c9c9c9;      /* texto de la barra */
-}
-
-/* Contenedor generado por Rouge para fences ``` */
-.page__content .highlighter-rouge {
-  position: relative;
-  max-width: 960px;
-  margin: 2rem auto;
-  background: var(--cb-bg);
-  border: 1px solid var(--cb-border);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.20);
-  overflow: hidden;
-  padding-top: 2rem; /* deja espacio para la barra */
-}
-
-/* El highlight interno no debe meter otro fondo */
+/* Rouge */
+:root { --cb-bg: #323232; --cb-header: #2a2a2a; --cb-border: rgba(255,255,255,0.10); --cb-fg: #e0e0e0; --cb-muted: #c9c9c9; }
+.page__content .highlighter-rouge { position: relative; max-width: 960px; margin: 2rem auto; background: var(--cb-bg); border: 1px solid var(--cb-border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.20); overflow: hidden; padding-top: 2rem; }
 .page__content .highlighter-rouge .highlight { background: transparent; }
-
-/* Barra superior (se inyecta por JS) */
-.page__content .code-header {
-  position: absolute;
-  inset: 0 auto auto 0;
-  height: 2rem;
-  background: var(--cb-header);
-  border-bottom: 1px solid var(--cb-border);
-  display: flex;
-  justify-content: space-between; /* ← ESTO ES LO QUE LO LLEVA A LOS EXTREMOS */
-  align-items: center;
-  padding: 0 .75rem;
-  font-family: 'Fira Code', ui-monospace, Menlo, Consolas, monospace;
-  font-size: .6rem;
-  color: var(--cb-muted);
-  width: 100%; /* por si acaso */
-}
-
-/* Botón Copy */
-.page__content .code-copy-btn {
-  appearance: none; background: transparent;
-  border: 1px solid rgba(255,255,255,0.15);
-  color: var(--cb-muted);
-  font-size: .6rem; padding: 2px 8px;
-  border-radius: 6px; cursor: pointer;
-  transition: background .15s, border-color .15s, transform .08s;
-}
+.page__content .code-header { position: absolute; inset: 0 auto auto 0; height: 2rem; background: var(--cb-header); border-bottom: 1px solid var(--cb-border); display: flex; justify-content: space-between; align-items: center; padding: 0 .75rem; font-family: 'Fira Code', ui-monospace, Menlo, Consolas, monospace; font-size: .6rem; color: var(--cb-muted); width: 100%; }
+.page__content .code-copy-btn { appearance: none; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: var(--cb-muted); font-size: .6rem; padding: 2px 8px; border-radius: 6px; cursor: pointer; transition: background .15s, border-color .15s, transform .08s; }
 .page__content .code-copy-btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.25); }
 .page__content .code-copy-btn:active { transform: translateY(1px); }
+.page__content .highlighter-rouge pre { margin: 0; padding: .75rem 1rem; background: transparent !important; color: var(--cb-fg); font-size: 14px; line-height: 1.45; overflow-x: auto; font-family: 'Fira Code', ui-monospace, Menlo, Consolas, monospace; }
+/* Sintaxis */
+.page__content .highlight .c, .page__content .highlight .c1 { color: #6A9955; font-style: italic; }
+.page__content .highlight .s, .page__content .highlight .s1, .page__content .highlight .s2 { color: #CE9178; }
+.page__content .highlight .m, .page__content .highlight .mi, .page__content .highlight .mf { color: #B5CEA8; }
+.page__content .highlight .k, .page__content .highlight .kd, .page__content .highlight .kn { color: #569CD6; }
+.page__content .highlight .nf { color: #DCDCAA; }
+.page__content .highlight .o { color: #D4D4D4; }
 
-/* Área de código */
-.page__content .highlighter-rouge pre {
-  margin: 0; padding: .75rem 1rem;
-  background: transparent !important;
-  color: var(--cb-fg);
-  font-size: 14px; line-height: 1.45;
-  overflow-x: auto;
-  font-family: 'Fira Code', ui-monospace, Menlo, Consolas, monospace;
-}
-
-/* ===== Colores de sintaxis (Rouge token classes) ===== */
-/* Comentarios */ .page__content .highlight .c, .page__content .highlight .c1 { color: #6A9955; font-style: italic; }
-/* Strings */     .page__content .highlight .s, .page__content .highlight .s1, .page__content .highlight .s2 { color: #CE9178; }
-/* Números */     .page__content .highlight .m, .page__content .highlight .mi, .page__content .highlight .mf { color: #B5CEA8; }
-/* Palabras clave */ .page__content .highlight .k, .page__content .highlight .kd, .page__content .highlight .kn { color: #569CD6; }
-/* Funciones */   .page__content .highlight .nf { color: #DCDCAA; }
-/* Operadores */  .page__content .highlight .o { color: #D4D4D4; }
-
-/* Ajuste de tamaño de letra y espaciado en posts */
-.page__content {
-  font-size: 0.8rem;  /* aumenta o reduce el valor según quieras */
-  line-height: 1.7;    /* más espacio entre líneas para mejor legibilidad */
-}
-
-/* Opcional: ajustar títulos dentro del post */
+/* Tipografía del post */
+.page__content { font-size: 0.8rem; line-height: 1.7; }
 .page__content h1 { font-size: 1.8rem; }
 .page__content h2 { font-size: 1.4rem; }
 .page__content h3 { font-size: 1.1rem; }
 
 /* ─────────────────────────────────────────────
-   HOME: mismo ancho que "single" SOLO para el contenido,
-   sin tocar el hero para que siga a ancho completo
+   HOME: ancho del contenido y hero full-width
 ────────────────────────────────────────────── */
+body.layout--home .archive, body.layout--home .archive__items { max-width: 1200px !important; margin-left: auto !important; margin-right: auto !important; padding-left: 2rem !important; padding-right: 2rem !important; box-sizing: border-box; }
+body.layout--home .page__hero, body.layout--home .page__hero--overlay { width: 100vw !important; max-width: 100vw !important; margin: 0 calc(50% - 50vw) !important; padding: 0; border-radius: 0; min-height: 200px; }
+body.layout--home .page__hero img { display: block; width: 100vw !important; max-width: 100vw !important; height: 100% !important; min-height: 400px; object-fit: cover; }
+@media (max-width: 767px) { body.layout--home .archive, body.layout--home .archive__items { max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; } }
+body.layout--home .page__hero--overlay { display: flex; align-items: center; justify-content: flex-start; padding-top: 0 !important; padding-bottom: 0 !important; min-height: 200px; }
+body.layout--home .page__hero--overlay .wrapper { width: 100%; padding-top: 0 !important; padding-bottom: 0 !important; }
+body.layout--home .page__hero--overlay .page__title { margin-top: 0 !important; margin-bottom: 0.25rem !important; }
 
-/* Contenido del home (listado, tarjetas, etc.) a 1200px centrado */
-body.layout--home .archive,
-body.layout--home .archive__items {
-  max-width: 1200px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding-left: 2rem !important;
-  padding-right: 2rem !important;
-  box-sizing: border-box;
-}
-
-/* Hero a ancho completo y altura original aproximada */
-body.layout--home .page__hero,
-body.layout--home .page__hero--overlay {
-  width: 100vw !important;
-  max-width: 100vw !important;
-  margin: 0 calc(50% - 50vw) !important;
-  padding: 0;
-  border-radius: 0;
-  min-height: 200px; /* ajusta según quieras, antes solía ser ~400-500px */
-}
-
-body.layout--home .page__hero img {
-  display: block;
-  width: 100vw !important;
-  max-width: 100vw !important;
-  height: 100% !important;      /* fuerza la imagen a cubrir el alto */
-  min-height: 400px;            /* mismo que el contenedor */
-  object-fit: cover;            /* mantiene proporción recortando */
-}
-
-/* Responsive móvil coherente con tus posts */
+/* ─────────────────────────────────────────────
+   CODE BLOCKS — responsive móvil
+────────────────────────────────────────────── */
 @media (max-width: 767px) {
-  body.layout--home .archive,
-  body.layout--home .archive__items {
-    max-width: 100% !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
+  .page__content .highlighter-rouge { margin: 1rem 0; border-radius: 6px; padding-top: 1.65rem !important; }
+  .page__content .code-header, .code-block .code-header { height: 1.65rem; font-size: 0.55rem; padding: 0 0.6rem; }
+  .page__content .code-copy-btn { font-size: 0.55rem; padding: 1px 6px; }
+  .page__content .highlighter-rouge pre, .page__content .highlight pre, .page__content pre code { font-size: 10px !important; line-height: 1.45; padding: 0.6rem 0.85rem !important; }
+  .code-block pre { font-size: 10px !important; padding: 0.6rem 0.85rem !important; }
+  .page__content p code, .page__content li code { font-size: 0.85em; padding: 0.05em 0.25em; }
 }
-
-/* Hero (home): centrar VERTICALMENTE el título sin moverlo horizontalmente */
-body.layout--home .page__hero--overlay {
-  display: flex;               /* convierte el hero en contenedor flex */
-  align-items: center;         /* centra en vertical */
-  justify-content: flex-start; /* mantiene alineación horizontal por defecto (izquierda) */
-  padding-top: 0 !important;   /* evita que el padding del tema lo baje */
-  padding-bottom: 0 !important;
-  min-height: 200px;           /* usa tu altura actual */
-}
-
-/* El wrapper hereda la altura del hero y no añade padding extra */
-body.layout--home .page__hero--overlay .wrapper {
-  width: 100%;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-/* (Opcional) si el tema aplica márgenes al título, los reducimos */
-body.layout--home .page__hero--overlay .page__title {
-  margin-top: 0 !important;
-  margin-bottom: 0.25rem !important;
+@media (max-width: 375px) {
+  .page__content .highlighter-rouge pre, .page__content .highlight pre, .code-block pre { font-size: 8px !important; }
+  .page__content .code-header, .code-block .code-header { height: 1.55rem; font-size: 0.5rem; }
+  .page__content .highlighter-rouge { padding-top: 1.55rem !important; }
 }
 
 /* ─────────────────────────────────────────────
-   CODE BLOCKS — responsive en móviles
+   MATHJAX - Scroll en ecuaciones
 ────────────────────────────────────────────── */
+.page__content mjx-container { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+.page__content mjx-container[display="true"] { display: block; }
+@media (max-width: 767px) { .page__content mjx-container { font-size: 0.95em; } }
 
-/* ≤ 767px: teléfonos */
-@media (max-width: 767px) {
-  /* Contenedor del bloque de código (Rouge) con barra superior */
-  .page__content .highlighter-rouge {
-    margin: 1rem 0;
-    border-radius: 6px;
-    padding-top: 1.65rem !important; /* antes 2rem: acompasa la barra más baja */
-  }
-
-  /* Barra superior del bloque (título / botón Copy) */
-  .page__content .code-header,
-  .code-block .code-header {
-    height: 1.65rem;
-    font-size: 0.55rem;
-    padding: 0 0.6rem;
-  }
-  .page__content .code-copy-btn {
-    font-size: 0.55rem;
-    padding: 1px 6px;
-  }
-
-  /* Código en bloques Rouge */
-  .page__content .highlighter-rouge pre,
-  .page__content .highlight pre,
-  .page__content pre code {
-    font-size: 10px !important;   /* ↓ desde 15px */
-    line-height: 1.45;
-    padding: 0.6rem 0.85rem !important;
-  }
-
-  /* Tu bloque .code-block “custom” (si lo usas en algunos fragmentos) */
-  .code-block pre {
-    font-size: 10px !important;   /* ↓ desde 13px */
-    padding: 0.6rem 0.85rem !important;
-  }
-
-  /* Inline code en párrafos/listas (un poco más pequeño también) */
-  .page__content p code,
-  .page__content li code {
-    font-size: 0.85em;
-    padding: 0.05em 0.25em;
-  }
-}
-
-/* ≤ 375px: móviles muy pequeños (opcional, un paso más) */
-@media (max-width: 375px) {
-  .page__content .highlighter-rouge pre,
-  .page__content .highlight pre,
-  .code-block pre {
-    font-size: 8px !important;
-  }
-  .page__content .code-header,
-  .code-block .code-header {
-    height: 1.55rem;
-    font-size: 0.5rem;
-  }
-  .page__content .highlighter-rouge {
-    padding-top: 1.55rem !important;
-  }
-}
-
- /* ─────────────────────────────────────────────
-   MATHJAX - Scroll en ecuaciones que desborden
-────────────────────────────────────────────── */
-/* MathJax v3: que las ecuaciones no se salgan del ancho del texto */
-.page__content mjx-container {
-  max-width: 100%;
-  overflow-x: auto;    /* si no cabe, aparece scroll horizontal */
-  overflow-y: hidden;
-}
-
-/* Asegura que las ecuaciones display se comporten como bloques fluidos */
-.page__content mjx-container[display="true"] {
-  display: block;
-}
-
-/* (Opcional) Reduce un poco el tamaño en móvil */
-@media (max-width: 767px) {
-  .page__content mjx-container {
-    font-size: 0.95em;  /* ajusta a tu gusto (0.9–0.95) */
-  }
-}
-
-/* ====== Autor sidebar: logos ORCID, Web of Science y UPNA ====== */
-/* No toques otros iconos; solo sustituimos los 3 específicos. */
-
-/* 1) ORCID */
+/* ====== Autor sidebar: iconos personalizados ====== */
 .author__urls a[href*="orcid.org"] i { display: none !important; }
-.author__urls a[href*="orcid.org"]::before {
-  content: "";
-  display: inline-block;
-  width: 1.25em;  /* tamaño cómodo */
-  height: 1.25em;
-  margin-right: .45em;
-  vertical-align: -0.2em;
-  background-color: currentColor; /* mismo gris que el texto/iconos */
-  -webkit-mask: url("/assets/icons/orcid.svg") no-repeat center / contain;
-          mask: url("/assets/icons/orcid.svg") no-repeat center / contain;
-}
-
-/* 2) Web of Science (Clarivate) */
+.author__urls a[href*="orcid.org"]::before { content: ""; display: inline-block; width: 1.25em; height: 1.25em; margin-right: .45em; vertical-align: -0.2em; background-color: currentColor; -webkit-mask: url("/assets/icons/orcid.svg") no-repeat center / contain; mask: url("/assets/icons/orcid.svg") no-repeat center / contain; }
 .author__urls a[href*="webofscience.com"] i { display: none !important; }
-.author__urls a[href*="webofscience.com"]::before {
-  content: "";
-  display: inline-block;
-  width: 1.25em;
-  height: 1.25em;
-  margin-right: .45em;
-  vertical-align: -0.2em;
-  background-color: currentColor;
-  -webkit-mask: url("/assets/icons/wos.svg") no-repeat center / contain;
-          mask: url("/assets/icons/wos.svg") no-repeat center / contain;
-}
-
-/* 3) UPNA — OJO: NO tocar el mailto de la universidad */
+.author__urls a[href*="webofscience.com"]::before { content: ""; display: inline-block; width: 1.25em; height: 1.25em; margin-right: .45em; vertical-align: -0.2em; background-color: currentColor; -webkit-mask: url("/assets/icons/wos.svg") no-repeat center / contain; mask: url("/assets/icons/wos.svg") no-repeat center / contain; }
 .author__urls a[href*="unavarra.es"]:not([href^="mailto:"]) i { display: none !important; }
-.author__urls a[href*="unavarra.es"]:not([href^="mailto:"])::before {
-  content: "";
-  display: inline-block;
-  width: 1.40em;   /* más grande para compensar viewBox con márgenes */
-  height: 1.40em;
-  margin-right: .45em;
-  vertical-align: -0.22em;
-  background-color: currentColor;
-  -webkit-mask: url("/assets/icons/upna.svg") no-repeat center / contain;
-          mask: url("/assets/icons/upna.svg") no-repeat center / contain;
-}
+.author__urls a[href*="unavarra.es"]:not([href^="mailto:"])::before { content: ""; display: inline-block; width: 1.40em; height: 1.40em; margin-right: .45em; vertical-align: -0.22em; background-color: currentColor; -webkit-mask: url("/assets/icons/upna.svg") no-repeat center / contain; mask: url("/assets/icons/upna.svg") no-repeat center / contain; }
+.author__urls a[href*="github.com"] i { display: none !important; }
+.author__urls a[href*="github.com"]::before { content: ""; display: inline-block; width: 1.25em; height: 1.25em; margin-right: .45em; vertical-align: -0.2em; background-color: currentColor; -webkit-mask: url("/assets/icons/github.svg") no-repeat center / contain; mask: url("/assets/icons/github.svg") no-repeat center / contain; }
+.author__urls a[href*="youtube.com"] i, .author__urls a[href*="youtu.be"] i { display: none !important; }
+.author__urls a[href*="youtube.com"]::before, .author__urls a[href*="youtu.be"]::before { content: ""; display: inline-block; width: 1.25em; height: 1.25em; margin-right: .45em; vertical-align: -0.2em; background-color: currentColor; -webkit-mask: url("/assets/icons/youtube.svg") no-repeat center / contain; mask: url("/assets/icons/youtube.svg") no-repeat center / contain; }
+.author__urls a[href*="youtube.com"]:hover::before, .author__urls a[href*="youtu.be"]::hover::before { opacity: 1; }
+.author__urls a[href*="orcid.org"]:hover::before, .author__urls a[href*="webofscience.com"]:hover::before, .author__urls a[href*="unavarra.es"]:not([href^="mailto:"]):hover::before { filter: none; }
 
-/* 4) GitHub */
-.author__urls a[href*="github.com"] i {
-  display: none !important; /* oculta el <i> de Font Awesome */
+/* ─────────────────────────────────────────────
+   HOME — Blog cards apiladas (con año) y acciones
+────────────────────────────────────────────── */
+.home-cards { display: block; margin: 2rem 0 3rem; }
+.blogcard {
+  position: relative; background: #fff; border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.12); overflow: hidden;
+  min-height: 480px; margin-bottom: 2rem; padding-bottom: 90px;
 }
-.author__urls a[href*="github.com"]::before {
-  content: "";
-  display: inline-block;
-  width: 1.25em;              /* ajusta si lo quieres un pelín mayor/menor */
-  height: 1.25em;
-  margin-right: .45em;
-  vertical-align: -0.2em;
-  background-color: currentColor; /* mismo gris que el texto/iconos */
-  -webkit-mask: url("/assets/icons/github.svg") no-repeat center / contain;
-          mask: url("/assets/icons/github.svg") no-repeat center / contain;
+.blogcard__thumb {
+  position: absolute; left: 24px; top: -24px; width: min(52%, 520px); height: 340px;
+  border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.35); background: #eee;
 }
+.blogcard__thumb img { position: absolute; left: 50%; top: 50%; width: 120%; height: auto; transform: translate(-50%,-50%); object-fit: cover; }
+.blogcard__body { margin-left: calc(min(52%, 520px) + 48px); margin-right: 24px; padding-top: 16px; padding-bottom: 8px; }
+.blogcard__title { margin: 18px 0 6px; font-size: 1.15rem; line-height: 1.25; }
+.blogcard__title a { color: #2c3e50; text-decoration: none; }
+.blogcard__title a:hover { color: #30e3ca; }
+.blogcard__author { display: inline-flex; align-items: center; gap: 8px; background: #9ECAFF; padding: 4px 10px; border-radius: 20px; height: 30px; }
+.blogcard__author img { width: 20px; height: 20px; border-radius: 50%; }
+.blogcard__author-name { font-size: .8rem; color: #fff; }
+.blogcard__sep { margin-top: 12px; border-top: 1px solid #C3C3C3; }
+.blogcard__excerpt { margin: 10px 0 0; font-size: .95rem; line-height: 1.5; color: #4B4B4B; text-align: justify; }
 
+/* Fecha con año */
+.blogcard__date { position: absolute; left: 24px; bottom: 16px; line-height: 1; pointer-events: none; }
+.blogcard__date .day { display: block; font-size: 4.2rem; color: #C3C3C3; }
+.blogcard__date .mon { display: block; margin-top: 4px; font-size: 1.1rem; color: #C3C3C3; letter-spacing: .06em; }
+.blogcard__date .year { display: block; margin-top: 2px; font-size: .9rem; color: #aeb4b7; }
 
-/* 5) YouTube (canal o video: youtube.com y youtu.be) */
-.author__urls a[href*="youtube.com"] i,
-.author__urls a[href*="youtu.be"] i {
-  display: none !important; /* oculta el <i> de Font Awesome */
+/* Acciones (views readonly / like / share) */
+.blogcard__actions {
+  position: absolute; right: 112px; bottom: 24px;
+  margin: 0; padding: 0; list-style: none;
+  display: flex; align-items: center; gap: 10px;
 }
-.author__urls a[href*="youtube.com"]::before,
-.author__urls a[href*="youtu.be"]::before {
-  content: "";
-  display: inline-block;
-  width: 1.25em;
-  height: 1.25em;
-  margin-right: .45em;
-  vertical-align: -0.2em;
-  background-color: currentColor; /* mismo gris que el resto */
-  -webkit-mask: url("/assets/icons/youtube.svg") no-repeat center / contain;
-          mask: url("/assets/icons/youtube.svg") no-repeat center / contain;
+.blogcard__actions li { display: inline-flex; align-items: center; }
+.blogcard__actions .action {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: transparent; border: none; color: #7B7B7B;
+  font: inherit; cursor: pointer; text-decoration: none;
+  padding: 3px 6px; border-radius: 6px; transition: background .15s ease, color .15s ease;
 }
+.blogcard__actions .action i { font-size: 0.78rem; }   /* iconos todavía más pequeños */
+.blogcard__actions .action .count { font-size: .85rem; opacity: .9; }
+.blogcard__actions .action:hover { background: #f2f2f2; color: #333; }
+.blogcard__actions .action--readonly { cursor: default; }
+.blogcard__actions .action--readonly:hover { background: transparent; color: #7B7B7B; }
 
-/* (opcional) mismo efecto hover que los otros */
-.author__urls a[href*="youtube.com"]:hover::before,
-.author__urls a[href*="youtu.be"]:hover::before {
-  opacity: 1;
-}
+/* Like: gris por defecto; rosa cuando está activo */
+.fa-heart { color: #7B7B7B; }     /* gris visible por defecto */
+.fa-heart.is-liked { color: #e91e63; }  /* rosa al dar like */
 
-/* Hover consistente (mismo color; si quieres, ajusta aquí) */
-.author__urls a[href*="orcid.org"]:hover::before,
-.author__urls a[href*="webofscience.com"]:hover::before,
-.author__urls a[href*="unavarra.es"]:not([href^="mailto:"]):hover::before {
-  filter: none; /* sin opacidad; mismo gris que los demás iconos */
+/* FAB (flecha a la derecha) */
+.blogcard__fab {
+  position: absolute; right: 24px; bottom: 16px; width: 64px; height: 64px; display: grid; place-items: center;
+  background: #1875D0; color: #fff; border-radius: 50%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.35); text-decoration: none; transition: transform .15s ease;
+}
+.blogcard__fab i { font-size: 1.1rem; }
+.blogcard__fab:hover { transform: translateX(2px); }
+
+/* Responsive */
+@media (max-width: 860px) {
+  .blogcard { min-height: auto; padding-bottom: 86px; }
+  .blogcard__thumb { position: relative; left: 0; top: 0; width: 100%; height: 220px; border-radius: 0; box-shadow: none; }
+  .blogcard__thumb img { width: 100%; height: 100%; transform: none; }
+  .blogcard__body { margin: 0; padding: 16px 16px 0; }
+  .blogcard__date { left: 16px; bottom: 16px; }
+  .blogcard__date .day { font-size: 2.2rem; }
+  .blogcard__date .mon { font-size: 1rem; margin-top: .35rem; }
+  .blogcard__date .year { font-size: .85rem; }
+  .blogcard__actions { right: 88px; bottom: 16px; gap: 8px; }
+  .blogcard__fab { right: 16px; bottom: 16px; width: 58px; height: 58px; }
 }

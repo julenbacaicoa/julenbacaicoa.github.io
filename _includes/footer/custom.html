@@ -1,9 +1,72 @@
 <!-- start custom footer snippets -->
 
+<!-- Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  window.__supabase = supabase.createClient(
+    '{{ site.supabase_url }}',
+    '{{ site.supabase_anon_key }}'
+  );
+</script>
+
 <!-- Code enhanced -->
 <script src="{{ '/assets/js/code-enhancer.js' | relative_url }}"></script>
 
 <!-- Code header -->
 <script src="{{ '/assets/js/code-header.js' | relative_url }}"></script>
+
+<!-- Post reads counter -->
+<script>
+  (function () {
+    // Solo en páginas de post (layout: single)
+    if (!document.body.classList.contains('layout--single')) return;
+
+    // Usa la ruta como clave
+    var path = window.location.pathname || "/";
+    var key = "views_" + path;
+    var v = 0;
+    try { v = parseInt(localStorage.getItem(key) || "0", 10); } catch (e) { v = 0; }
+    v = v + 1;
+    try { localStorage.setItem(key, String(v)); } catch (e) {}
+
+    // (Opcional) mostrar vistas dentro del post si existe un target:
+    // const el = document.querySelector('[data-post-views]');
+    // if (el) el.textContent = v;
+  })();
+</script>
+
+<script>
+  (function () {
+    if (!document.body.classList.contains('layout--single')) return;
+
+    const sb   = window.__supabase;
+    const slug = window.location.pathname; // ej: /blog/mi-post/
+    const seen = 'srv_viewed_' + slug;
+
+    // Evita duplicar en la misma sesión/ventana
+    if (!sessionStorage.getItem(seen)) {
+      sessionStorage.setItem(seen, '1');
+      sb?.rpc('inc_view', { p_slug: slug }).catch(() => {});
+    }
+  })();
+</script>
+
+<script>
+  (async function () {
+    if (!document.body.classList.contains('layout--single')) return;
+    const sb   = window.__supabase;
+    const slug = window.location.pathname;
+
+    try {
+      const { data } = await sb.from('post_metrics')
+        .select('views,likes')
+        .eq('slug', slug)
+        .single();
+      document.querySelector('[data-post-views]')?.replaceChildren(document.createTextNode(data?.views ?? '0'));
+      document.querySelector('[data-post-likes]')?.replaceChildren(document.createTextNode(data?.likes ?? '0'));
+    } catch(e) {}
+  })();
+</script>
+
 
 <!-- end custom footer snippets -->
