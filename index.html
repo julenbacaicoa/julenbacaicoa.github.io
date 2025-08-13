@@ -99,8 +99,13 @@ author_profile: true
     const container = document.getElementById('home-posts');
     if (!container) return;
 
-    const sb = window.__supabase;
-
+    const BASE = '{{ site.baseurl | default: "" }}';
+    function canonicalSlug(pathname) {
+      let s = pathname || "/";
+      if (BASE && s.startsWith(BASE)) s = s.slice(BASE.length);
+      if (!s.startsWith("/")) s = "/" + s;
+      return s;
+    }
     function fullUrl(relative) {
       try { return new URL(relative, window.location.origin).toString(); }
       catch (e) { return relative; }
@@ -112,33 +117,39 @@ author_profile: true
     function setLocalCount(key, val) {
       localStorage.setItem(key, String(val));
     }
-    function getLikeState(url) {
-      return localStorage.getItem(`like_state_${url}`) === '1';
+    function getLikeState(slug) {
+      return localStorage.getItem(`like_state_${slug}`) === '1';
     }
-    function setLikeState(url, liked) {
-      localStorage.setItem(`like_state_${url}`, liked ? '1' : '0');
+    function setLikeState(slug, liked) {
+      localStorage.setItem(`like_state_${slug}`, liked ? '1' : '0');
     }
 
-    // 1) Trae métricas de Supabase en bloque
+    // Espera a Supabase (si no carga, seguimos en modo "solo local")
+    let sb = null;
+    try { sb = await window.__supabaseReady; } catch (e) {}
+
+    // Trae métricas del servidor (si hay cliente)
     let metrics = new Map();
-    try {
-      const slugs = posts.map(p => p.url);
-      const { data, error } = await sb
-        .from('post_metrics')
-        .select('slug,views,likes')
-        .in('slug', slugs);
-      if (!error && Array.isArray(data)) {
-        metrics = new Map(data.map(r => [r.slug, r]));
-      }
-    } catch (e) {}
+    if (sb) {
+      try {
+        const slugs = posts.map(p => canonicalSlug(p.url));
+        const { data, error } = await sb
+          .from('post_metrics')
+          .select('slug,views,likes')
+          .in('slug', slugs);
+        if (!error && Array.isArray(data)) {
+          metrics = new Map(data.map(r => [r.slug, r]));
+        }
+      } catch (e) {}
+    }
 
-    // 2) Construye cada card
     posts.forEach(p => {
       const card = document.createElement('article');
       card.className = 'blogcard';
 
       const imgUrl = p.image && p.image !== "{{ '' | relative_url }}" ? p.image : "/assets/images/placeholder-940x540.png";
       const absoluteUrl = fullUrl(p.url);
+      const slug = canonicalSlug(p.url);
 
       card.innerHTML = `
         <div class="blogcard__thumb">
@@ -183,48 +194,41 @@ author_profile: true
         </a>
       `;
 
-      // Estado inicial (server primero, fallback a local)
-      const viewsKey   = `views_${p.url}`;
-      const likesKey   = `likes_${p.url}`;
-      const viewsEl    = card.querySelector('[data-role="views"]');
-      const likesEl    = card.querySelector('[data-role="likes"]');
-      const heartIcon  = card.querySelector('[data-role="heart"]');
+      const viewsKey  = `views_${slug}`;
+      const likesKey  = `likes_${slug}`;
+      const viewsEl   = card.querySelector('[data-role="views"]');
+      const likesEl   = card.querySelector('[data-role="likes"]');
+      const heartIcon = card.querySelector('[data-role="heart"]');
 
-      const m = metrics.get(p.url);
-      const serverViews = m?.views ?? null;
-      const serverLikes = m?.likes ?? null;
-
-      const currentViews = serverViews ?? getLocalCount(viewsKey);
-      const currentLikes = serverLikes ?? getLocalCount(likesKey);
-      const liked        = getLikeState(p.url);
+      const m = metrics.get(slug);
+      const currentViews = (m && typeof m.views === 'number') ? m.views : getLocalCount(viewsKey);
+      const currentLikes = (m && typeof m.likes === 'number') ? m.likes : getLocalCount(likesKey);
+      const liked        = getLikeState(slug);
 
       if (viewsEl) viewsEl.textContent = currentViews;
       if (likesEl) likesEl.textContent = currentLikes;
-
       if (liked) heartIcon.classList.add('is-liked');
 
-      // Like: toggle local + Supabase (+1 / -1)
+      // Like toggle (local + servidor si disponible)
       const likeBtn = card.querySelector('.action-like');
       likeBtn.addEventListener('click', async () => {
-        const isLiked = getLikeState(p.url);
+        const isLiked = getLikeState(slug);
         let l = parseInt(likesEl.textContent || '0', 10);
 
         if (isLiked) {
           l = Math.max(0, l - 1);
           heartIcon.classList.remove('is-liked');
-          setLikeState(p.url, false);
+          setLikeState(slug, false);
           setLocalCount(likesKey, l);
           likesEl.textContent = l;
-          // servidor
-          try { await sb.rpc('add_like', { p_slug: p.url, p_delta: -1 }); } catch (e) {}
+          if (sb) { try { await sb.rpc('add_like', { p_slug: slug, p_delta: -1 }); } catch (e) {} }
         } else {
           l = l + 1;
           heartIcon.classList.add('is-liked');
-          setLikeState(p.url, true);
+          setLikeState(slug, true);
           setLocalCount(likesKey, l);
           likesEl.textContent = l;
-          // servidor
-          try { await sb.rpc('add_like', { p_slug: p.url, p_delta: 1 }); } catch (e) {}
+          if (sb) { try { await sb.rpc('add_like', { p_slug: slug, p_delta: 1 }); } catch (e) {} }
         }
       });
 
