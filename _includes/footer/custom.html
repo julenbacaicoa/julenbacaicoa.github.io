@@ -4,9 +4,7 @@
 <script>
   (function () {
     function fireReady(sb) {
-      try {
-        document.dispatchEvent(new CustomEvent('supabase:ready', { detail: sb }));
-      } catch (e) {}
+      try { document.dispatchEvent(new CustomEvent('supabase:ready', { detail: sb })); } catch (e) {}
     }
     window.__supabaseReady = new Promise(function (resolve) {
       function init() {
@@ -18,7 +16,7 @@
             );
           }
           resolve(window.__supabase);
-          fireReady(window.__supabase); // 🔔 avisa SIEMPRE que está listo
+          fireReady(window.__supabase);
         } catch (e) { console.error('Supabase init error:', e); }
       }
       function inject(src, onload) {
@@ -36,7 +34,7 @@
       else inject('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', init);
     });
 
-    /* Slug canónico (igual que en Home/Blog) */
+    /* Slug canónico compartido */
     window.__canonicalSlug = function (pathname) {
       const BASE = '{{ site.baseurl | default: "" }}';
       let s = pathname || "/";
@@ -55,18 +53,25 @@
 <!-- Code header -->
 <script src="{{ '/assets/js/code-header.js' | relative_url }}"></script>
 
-<!-- Post reads counter (solo servidor, sin UI en el post) -->
+<!-- Post views: incrementa SOLO en posts (detecta meta x-is-post) -->
 <script>
   (function () {
-    if (!document.body.classList.contains('layout--single')) return;
-    const slug = window.__canonicalSlug(window.location.pathname);
-    try {
-      const seen = 'srv_viewed_' + slug;
-      if (!sessionStorage.getItem(seen)) {
-        sessionStorage.setItem(seen, '1');
-        window.__supabaseReady.then(sb => sb.rpc('inc_view', { p_slug: slug }).catch(() => {}));
-      }
-    } catch (e) {}
+    const isPost = document.querySelector('meta[name="x-is-post"][content="1"]');
+    if (!isPost) return; // no cuentes en home, blog, páginas...
+
+    // Slug desde meta (si existe) o desde la URL actual; normalizado
+    const raw = (document.querySelector('meta[name="x-post-slug"]') || {}).content || window.location.pathname;
+    const slug = window.__canonicalSlug(raw);
+
+    // Evita duplicar en la misma pestaña/ventana
+    const KEY = 'srv_viewed_' + slug;
+    if (!sessionStorage.getItem(KEY)) {
+      sessionStorage.setItem(KEY, '1');
+      window.__supabaseReady.then(sb => {
+        sb.rpc('inc_view', { p_slug: slug })
+          .catch(() => { /* silenciar errores de red/RPC */ });
+      });
+    }
   })();
 </script>
 

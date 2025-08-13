@@ -27,6 +27,16 @@ layout: default
     {% if page.date %}<meta itemprop="datePublished" content="{{ page.date | date_to_xmlschema }}">{% endif %}
     {% if page.last_modified_at %}<meta itemprop="dateModified" content="{{ page.last_modified_at | date_to_xmlschema }}">{% endif %}
 
+    {%- comment -%}
+      Marcadores para scripts cliente: sólo existirán en posts (page.id existe en posts).
+      x-is-post = "1" → es un post real
+      x-post-slug      → slug original renderizado por Jekyll (lo normalizaremos en el footer)
+    {%- endcomment -%}
+    {% if page.id %}
+      <meta name="x-is-post" content="1">
+      <meta name="x-post-slug" content="{{ page.url | relative_url }}">
+    {% endif %}
+
     <div class="page__inner-wrap">
       {% unless page.header.overlay_color or page.header.overlay_image %}
         <header>
@@ -48,9 +58,7 @@ layout: default
             </nav>
           </aside>
         {% endif %}
-
         {{ content }}
-
         {% if page.link %}<div><a href="{{ page.link }}" class="btn btn--primary">{{ site.data.ui-text[site.locale].ext_link_label | default: "Direct Link" }}</a></div>{% endif %}
       </section>
 
