@@ -215,42 +215,66 @@ author_profile: true
   })();
 </script>
 
-<!-- Sincroniza métricas cuando el SDK esté listo (evento + comprobación inmediata) -->
+<!-- Sincroniza métricas cuando el SDK esté listo + en foco + cada 30s -->
 <script>
   (function () {
-    async function syncFromServer(sb, cards) {
+    let syncing = false;
+    let lastSync = 0;
+    const MIN_GAP = 8000;   // no sincronizar más de 1 vez cada 8s
+    const POLL_MS = 30000;  // refresco periódico (ajústalo a tu gusto)
+
+    async function doSync() {
+      if (!window.__cardsForSync || syncing) return;
+      const now = Date.now();
+      if (now - lastSync < MIN_GAP) return;
+
+      // Obtén el cliente (ya cargado o cuando la promesa se resuelva)
+      const sb = window.__supabase || (window.__supabaseReady && await window.__supabaseReady);
+      if (!sb) return;
+
+      syncing = true;
       try {
-        const slugs = cards.map(c => c.slug);
+        const slugs = window.__cardsForSync.map(c => c.slug);
         if (!slugs.length) return;
+
         const { data, error } = await sb
           .from('post_metrics')
           .select('slug,views,likes')
           .in('slug', slugs);
-        if (error || !Array.isArray(data)) return;
-        const map = new Map(data.map(r => [r.slug, r]));
-        for (const c of cards) {
-          const m = map.get(c.slug);
-          if (m) {
-            c.viewsEl.textContent = m.views;
-            c.likesEl.textContent = m.likes;
-            localStorage.setItem(c.viewsKey, String(m.views));
-            localStorage.setItem(c.likesKey, String(m.likes));
-          }
-        }
-      } catch {}
-    }
 
-    function trySyncNow() {
-      if (window.__supabase && typeof window.__supabase.from === 'function' && window.__cardsForSync) {
-        syncFromServer(window.__supabase, window.__cardsForSync);
+        if (!error && Array.isArray(data)) {
+          const map = new Map(data.map(r => [r.slug, r]));
+          for (const c of window.__cardsForSync) {
+            const m = map.get(c.slug);
+            if (m) {
+              c.viewsEl.textContent = m.views;
+              c.likesEl.textContent = m.likes;
+              localStorage.setItem(c.viewsKey, String(m.views));
+              localStorage.setItem(c.likesKey, String(m.likes));
+            }
+          }
+          lastSync = Date.now();
+        }
+      } catch (_) {
+        /* ignora errores de red */
+      } finally {
+        syncing = false;
       }
     }
 
-    // 1) si ya está el cliente, sincroniza
-    trySyncNow();
-    // 2) cuando el loader emita el evento, sincroniza (aunque cargue tarde)
-    document.addEventListener('supabase:ready', (ev) => {
-      if (ev.detail && window.__cardsForSync) syncFromServer(ev.detail, window.__cardsForSync);
-    }, { once: true });
+    // 1) Intenta sincronizar ahora mismo si se puede
+    doSync();
+
+    // 2) Cuando el loader emita el evento (SDK listo), sincroniza
+    document.addEventListener('supabase:ready', () => { doSync(); });
+
+    // 3) Al volver a la pestaña/ventana (mejora UX)
+    window.addEventListener('focus', () => { doSync(); });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) doSync();
+    });
+
+    // 4) Polling suave cada 30s (cámbialo o elimina esta línea si no lo quieres)
+    setInterval(() => { doSync(); }, POLL_MS);
   })();
 </script>
