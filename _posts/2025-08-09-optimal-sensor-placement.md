@@ -5,7 +5,7 @@ date: 2025-08-09 16:00:00 +0200
 categories: [papers, sensors]
 tags: [strain-gauges, optimal-placement, sensor-design, experimentation]
 author_profile: true
-excerpt: "How to get a full 6 load components estimate from a tiny, optimised set of strain gauges — theory, optimisation, and practical calibration."
+excerpt: "Less is more: estimate all six load components with just 6–8 optimised strain gauges. Linear-model intuition, D-optimal placement, symmetric layouts, built-in temperature compensation, and a practical calibration workflow validated in the lab." # Maximum 30-32 words
 image: /assets/images/blog/gauge_acotation.jpg
 published: true
 ---

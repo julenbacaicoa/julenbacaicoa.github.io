@@ -185,32 +185,24 @@ body.layout--home .page__hero--overlay .page__title { margin-top: 0 !important; 
    HOME — Blog cards apiladas (con año) y acciones
 ────────────────────────────────────────────── */
 .home-cards { display: block; margin: 2rem 0 3rem; }
+
+/* MÁS ESPACIO ENTRE CARDS: ↑ margen superior y ↑ margen inferior */
 .blogcard {
   position: relative; background: #fff; border-radius: 12px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.12); overflow: visible;  /* antes: hidden */
-  min-height: 480px; margin: 32px 0 2rem;                      /* ↑ margen top p/que no pise lo anterior */
+  box-shadow: 0 8px 40px rgba(0,0,0,0.12); overflow: visible;            /* antes: hidden */
+  min-height: 480px; margin: 40px 0 3rem;                                 /* antes: 32px 0 2rem */
   padding-bottom: 90px;
 }
 .blogcard__thumb {
-  position: absolute; left: 24px; top: -36px;                  /* antes: -24px */
+  position: absolute; left: 24px; top: -36px;                              /* saca la imagen por arriba */
   width: min(52%, 520px); height: 340px;
   border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.35);
-  background: #eee; aspect-ratio: 16 / 10;
-  z-index: 2;                                                  /* asegura que quede por encima del card */
-  display: flex;                 /* centra el contenido */
-  align-items: center;           /* centra vertical */
-  justify-content: center;       /* centra horizontal */
-  background: #fff;
+  background: #fff; aspect-ratio: 16 / 10; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
 }
-/* FIX: imagen siempre cubre el contenedor (desktop) */
-.blogcard__thumb img {
-  position: static;              /* antes absoluto */
-  width: 100%;                   /* ajusta a la anchura del contenedor */
-  height: auto;                  /* mantiene proporción → podrá dejar barras arriba/abajo */
-  object-fit: contain;           /* evita recortes */
-  object-position: center;
-  transform: none;
-}
+/* Imagen ajustada al ancho (puede dejar barras arriba/abajo) */
+.blogcard__thumb img { position: static; width: 100%; height: auto; object-fit: contain; object-position: center; transform: none; }
+
 .blogcard__body { margin-left: calc(min(52%, 520px) + 48px); margin-right: 24px; padding-top: 16px; padding-bottom: 8px; }
 .blogcard__title { margin: 14px 0 6px; font-size: 1.05rem; line-height: 1.2; }
 .blogcard__title a { color: #2c3e50; text-decoration: none; font-size: inherit; }
@@ -229,58 +221,29 @@ body.layout--home .page__hero--overlay .page__title { margin-top: 0 !important; 
 .blogcard__date .year { display: block; margin-top: 2px; font-size: .9rem; color: #aeb4b7; }
 
 /* Acciones (views readonly / like / share) */
-.blogcard__actions {
-  position: absolute; right: 112px; bottom: 24px;
-  margin: 0; padding: 0; list-style: none;
-  display: flex; align-items: center; gap: 10px;
-}
+.blogcard__actions { position: absolute; right: 112px; bottom: 24px; margin: 0; padding: 0; list-style: none; display: flex; align-items: center; gap: 10px; }
 .blogcard__actions li { display: inline-flex; align-items: center; }
-.blogcard__actions .action {
-  display: inline-flex; align-items: center; gap: 5px;
-  background: transparent; border: none; color: #7B7B7B;
-  font: inherit; cursor: pointer; text-decoration: none;
-  padding: 3px 6px; border-radius: 6px; transition: background .15s ease, color .15s ease;
-}
-.blogcard__actions .action i { font-size: 0.78rem; }   /* iconos todavía más pequeños */
+.blogcard__actions .action { display: inline-flex; align-items: center; gap: 5px; background: transparent; border: none; color: #7B7B7B; font: inherit; cursor: pointer; text-decoration: none; padding: 3px 6px; border-radius: 6px; transition: background .15s ease, color .15s ease; }
+.blogcard__actions .action i { font-size: 0.78rem; }
 .blogcard__actions .action .count { font-size: .85rem; opacity: .9; }
 .blogcard__actions .action:hover { background: #f2f2f2; color: #333; }
 .blogcard__actions .action--readonly { cursor: default; }
 .blogcard__actions .action--readonly:hover { background: transparent; color: #7B7B7B; }
 
 /* Like: gris por defecto; rosa cuando está activo */
-.fa-heart { color: #7B7B7B; }     /* gris visible por defecto */
-.fa-heart.is-liked { color: #e91e63; }  /* rosa al dar like */
+.fa-heart { color: #7B7B7B; }
+.fa-heart.is-liked { color: #e91e63; }
 
 /* FAB (flecha a la derecha) */
-.blogcard__fab {
-  position: absolute; right: 24px; bottom: 16px; width: 64px; height: 64px; display: grid; place-items: center;
-  background: #30e3ca; color: #fff; border-radius: 50%;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.35); text-decoration: none; transition: transform .15s ease;
-}
+.blogcard__fab { position: absolute; right: 24px; bottom: 16px; width: 64px; height: 64px; display: grid; place-items: center; background: #30e3ca; color: #fff; border-radius: 50%; box-shadow: 0 10px 40px rgba(0,0,0,0.35); text-decoration: none; transition: transform .15s ease; }
 .blogcard__fab i { font-size: 1.1rem; }
 .blogcard__fab:hover { transform: translateX(2px); }
 
 /* Responsive */
 @media (max-width: 860px) {
   .blogcard { min-height: auto; padding-bottom: 86px; overflow: hidden; margin-top: 0; }
-  /* FIX: forzar layout móvil robusto */
-  .blogcard__thumb {
-    /* ya forzabas layout móvil; mantenlo */
-    position: relative !important;
-    left: 0 !important; top: 0 !important;
-    width: 100% !important; height: auto !important;
-    aspect-ratio: 16 / 9 !important;
-    border-radius: 0; box-shadow: none;
-    display: flex; align-items: center; justify-content: center;  /* centra imagen */
-    background: #fff;                                             /* barras blancas */
-  }
-  .blogcard__thumb img {
-    position: static !important;
-    width: 100% !important;
-    height: auto !important;          /* clave: ajusta a ancho */
-    object-fit: contain !important;   /* sin recorte */
-    transform: none !important;
-  }
+  .blogcard__thumb { position: relative !important; left: 0 !important; top: 0 !important; width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; border-radius: 0; box-shadow: none; display: flex; align-items: center; justify-content: center; background: #fff; }
+  .blogcard__thumb img { position: static !important; width: 100% !important; height: auto !important; object-fit: contain !important; transform: none !important; }
   .blogcard__body { margin: 0; padding: 16px 16px 0; }
   .blogcard__date { left: 16px; bottom: 16px; }
   .blogcard__date .day { font-size: 2.2rem; }
@@ -293,6 +256,10 @@ body.layout--home .page__hero--overlay .page__title { margin-top: 0 !important; 
 /* ─────────────────────────────────────────────
    FIX: VIEWS / LIKES en single post arriba
 ────────────────────────────────────────────── */
-/* Contadores arriba del post, alineados a la izquierda */
 .layout--single .post-stats{font-size:.9rem;color:#666;margin:.35rem 0 1rem;text-align:left;clear:both}
 
+/* ─────────────────────────────────────────────
+   HOME — Título de sección "Recent posts"
+────────────────────────────────────────────── */
+.home-section-title{margin:2.6rem 0 1.2rem;font-size:1.25rem;color:#2c3e50}
+@media (max-width:767px){.home-section-title{margin:2rem 0 .9rem;font-size:1.1rem}}
