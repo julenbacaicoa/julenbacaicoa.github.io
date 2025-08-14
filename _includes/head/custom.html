@@ -1,7 +1,5 @@
 <!-- start custom head snippets -->
 
-<!-- insert favicons. use https://realfavicongenerator.net/ -->
-
 <!-- MathJax -->
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
@@ -14,15 +12,18 @@
 <!-- Custom fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
 
-<!-- ===== Favicons (Safari/iOS + pinned tab + fallbacks) ===== -->
-<link rel="icon" href="{{ '/favicon.ico?v=3' | relative_url }}" sizes="any">
-<link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg?v=3' | relative_url }}">
-<link rel="apple-touch-icon" href="{{ '/apple-touch-icon.png?v=3' | relative_url }}">
-<link rel="mask-icon" href="{{ '/safari-pinned-tab.svg?v=3' | relative_url }}" color="#1875D0">
-<link rel="manifest" href="{{ '/site.webmanifest?v=3' | relative_url }}">
+<!-- ===== Icons / PWA ===== -->
+<!-- Modern browsers: SVG favicon -->
+<link rel="icon" type="image/svg+xml" href="{{ '/assets/images/favicon.svg?v=4' | relative_url }}">
+<!-- Fallback PNG favicon -->
+<link rel="icon" type="image/png" href="{{ '/assets/images/favicon.png?v=4' | relative_url }}" sizes="32x32">
+<!-- Apple iOS icon -->
+<link rel="apple-touch-icon" href="{{ '/assets/images/apple-touch-icon.png?v=4' | relative_url }}" sizes="180x180">
+<!-- Safari pinned tab -->
+<link rel="mask-icon" href="{{ '/assets/images/safari-pinned-tab.svg?v=4' | relative_url }}" color="#1875D0">
+<!-- Web manifest (en la raíz del repo) -->
+<link rel="manifest" href="{{ '/site.webmanifest?v=4' | relative_url }}">
 <meta name="theme-color" content="#30e3ca">
 
-<!-- Fallback PNG (por si aún no tienes los de raíz) -->
-<link rel="shortcut icon" href="{{ '/assets/images/favicon.png?v=3' | relative_url }}" type="image/png">
-
 <!-- end custom head snippets -->
+
