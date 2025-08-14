@@ -52,13 +52,13 @@
 <!-- Code header -->
 <script src="{{ '/assets/js/code-header.js' | relative_url }}"></script>
 
-<!-- Post views: cuenta vistas en páginas con x-track-views; SDK + REST + reintento; debug y helper -->
+<!-- Post views: cuenta vistas en páginas con x-track-views; SDK + REST + reintento; con anti-doble -->
 <script>
   (function () {
     const DEBUG = /[?&]debug=views\b/.test(location.search);
 
     const isTrack = document.querySelector('meta[name="x-track-views"][content="1"]')
-                   || document.body.classList.contains('layout--single'); // fallback
+                   || document.body.classList.contains('layout--single');
     if (!isTrack) return;
 
     // Debug badge
@@ -75,11 +75,15 @@
     }
 
     const raw  = (document.querySelector('meta[name="x-post-slug"]') || {}).content || location.pathname;
-    const slug = window.__canonicalSlug(raw);
+    const slug = window.__canonicalSlug ? window.__canonicalSlug(raw) : raw;
 
-    // Evita duplicar en la misma pestaña: solo marcamos tras éxito
+    // Evita duplicar en la misma pestaña (solo marcamos TRAS éxito)
     const SESSION_KEY = 'srv_viewed_' + slug;
     if (sessionStorage.getItem(SESSION_KEY)) { say('ya contado esta pestaña'); return; }
+
+    // === Candados anti-doble (misma carga de página) ===
+    let started  = false;   // ya hemos iniciado un bump
+    let finished = false;   // bump completado con éxito
 
     const SB_URL = '{{ site.supabase_url }}'.replace(/\/+$/, '');
     const SB_KEY = '{{ site.supabase_anon_key }}';
@@ -92,7 +96,7 @@
         if (!ready) return false;
         const sb = await Promise.race([
           ready,
-          new Promise((_, r) => setTimeout(() => r(new Error('sdk-timeout')), ms || 1800))
+          new Promise((_, r) => setTimeout(() => r(new Error('sdk-timeout')), ms || 1600))
         ]);
         if (!sb || typeof sb.rpc !== 'function') return false;
         const { error } = await sb.rpc('inc_view', { p_slug: slug });
@@ -120,34 +124,44 @@
     }
 
     function afterSuccess() {
+      finished = true;                  // marca que ya hicimos un bump válido
       sessionStorage.setItem(SESSION_KEY, '1');
       say('SUCCESS');
     }
 
     async function tryBump() {
+      // ← candado: impide que se inicien dos intentos en paralelo
+      if (started || finished) return;
+      started = true;
+
       say('slug ' + slug);
-      let ok = await bumpViaSDK(1800);
+      let ok = await bumpViaSDK(1600);
       if (!ok) ok = await bumpViaREST();
+
       if (!ok) {
-        say('reintento en 2.5s…');
+        say('reintento en ~2.2s…');
         setTimeout(async () => {
-          let ok2 = await bumpViaSDK(1800);
+          if (finished) return;         // si ya se consiguió por otro camino, no repitas
+          let ok2 = await bumpViaSDK(1600);
           if (!ok2) ok2 = await bumpViaREST();
-          if (ok2) afterSuccess(); else say('falló todo');
-        }, 2500);
+          if (ok2) afterSuccess();
+        }, 2200);
       } else {
         afterSuccess();
       }
     }
 
+    // Disparo inicial
     tryBump();
+
+    // Si el SDK llega tarde, reintenta UNA vez — protegido por los candados
     document.addEventListener('supabase:ready', () => {
-      if (!sessionStorage.getItem(SESSION_KEY)) { say('ready event → retry'); tryBump(); }
+      if (!finished) tryBump();
     }, { once: true });
 
-    // Helper de depuración: puedes llamar window.bumpView('/misc/welcome/')
+    // Helper de depuración: window.bumpView('/misc/welcome/')
     window.bumpView = async function (s) {
-      const target = window.__canonicalSlug(s || slug);
+      const target = (window.__canonicalSlug ? window.__canonicalSlug(s || slug) : (s || slug));
       const res = await fetch(SB_URL + '/rest/v1/rpc/inc_view', {
         method: 'POST',
         headers: {
@@ -157,11 +171,12 @@
         },
         body: JSON.stringify({ p_slug: target })
       });
-      const txt = await res.text().catch(()=>'');
+      const txt = await res.text().catch(()=> '');
       console.log('bumpView', target, res.status, txt);
       return res.status;
     };
   })();
 </script>
+
 
 <!-- end custom footer snippets -->
