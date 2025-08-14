@@ -3,7 +3,6 @@ layout: single
 title: "Blog"
 permalink: /blog/
 author_profile: true
-classes: wide
 ---
 
 Welcome to my blog! Here I share short thoughts, deep dives, and technical explorations related to science, code, data, and curiosity.
@@ -30,12 +29,13 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
   ];
 </script>
 
-<!-- Construcción de cards (pinta primero; sincroniza después) -->
+<!-- Construcción de cards (mismo comportamiento que Home) -->
 <script>
   (function () {
     const container = document.getElementById('blog-posts');
     if (!container || !Array.isArray(posts)) return;
 
+    /* Utilidades (igual que Home) */
     const BASE = '{{ site.baseurl | default: "" }}';
     function canonicalSlug(pathname) {
       let s = pathname || "/";
@@ -45,12 +45,15 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
       if (s !== "/" && !s.endsWith("/")) s += "/";
       return s.toLowerCase();
     }
-    function fullUrl(relative){try{return new URL(relative,location.origin).toString();}catch{return relative;}}
-    function getLocalCount(k){const v=localStorage.getItem(k);return v?parseInt(v,10):0;}
-    function setLocalCount(k,v){localStorage.setItem(k,String(v));}
-    function getLikeState(slug){return localStorage.getItem(`like_state_${slug}`)==='1';}
-    function setLikeState(slug,b){localStorage.setItem(`like_state_${slug}`, b?'1':'0');}
+    function fullUrl(relative) {
+      try { return new URL(relative, window.location.origin).toString(); } catch { return relative; }
+    }
+    function getLocalCount(key) { const v = localStorage.getItem(key); return v ? parseInt(v,10) : 0; }
+    function setLocalCount(key, val) { localStorage.setItem(key, String(val)); }
+    function getLikeState(slug) { return localStorage.getItem(`like_state_${slug}`) === '1'; }
+    function setLikeState(slug, liked) { localStorage.setItem(`like_state_${slug}`, liked ? '1' : '0'); }
 
+    /* Pintado inicial de cards (sin depender del footer) */
     const cards = [];
     posts.forEach(p => {
       const card = document.createElement('article');
@@ -96,29 +99,32 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
         <a class="blogcard__fab" href="${p.url}" title="Read"><i class="fa fa-arrow-right"></i></a>
       `;
 
-      const viewsEl = card.querySelector('[data-role="views"]');
-      const likesEl = card.querySelector('[data-role="likes"]');
+      const viewsKey  = `views_${slug}`;
+      const likesKey  = `likes_${slug}`;
+      const viewsEl   = card.querySelector('[data-role="views"]');
+      const likesEl   = card.querySelector('[data-role="likes"]');
       const heartIcon = card.querySelector('[data-role="heart"]');
-      const likeBtn = card.querySelector('.action-like');
+      const likeBtn   = card.querySelector('.action-like');
 
-      const viewsKey = `views_${slug}`;
-      const likesKey = `likes_${slug}`;
-
+      /* Estado inicial local */
       viewsEl.textContent = getLocalCount(viewsKey);
       likesEl.textContent = getLocalCount(likesKey);
       if (getLikeState(slug)) heartIcon.classList.add('is-liked');
 
+      /* Like toggle (optimista) + sync */
       likeBtn.addEventListener('click', async () => {
         if (likeBtn.disabled) return; likeBtn.disabled = true;
         const was = getLikeState(slug);
         let l = parseInt(likesEl.textContent || '0', 10);
-        if (was) { l = Math.max(0,l-1); heartIcon.classList.remove('is-liked'); setLikeState(slug,false); }
-        else     { l = l+1;             heartIcon.classList.add('is-liked');    setLikeState(slug,true);  }
+        if (was) { l = Math.max(0, l - 1); heartIcon.classList.remove('is-liked'); setLikeState(slug, false); }
+        else     { l = l + 1;               heartIcon.classList.add('is-liked');    setLikeState(slug, true);  }
         setLocalCount(likesKey, l);
         likesEl.textContent = l;
 
         try {
-          const sb = (window.__supabaseReady && typeof window.__supabaseReady.then==='function') ? await window.__supabaseReady : null;
+          const sb = (window.__supabaseReady && typeof window.__supabaseReady.then === 'function')
+            ? await window.__supabaseReady
+            : null;
           if (sb) {
             const delta = was ? -1 : 1;
             const { data, error } = await sb.rpc('add_like', { p_slug: slug, p_delta: delta });
@@ -131,11 +137,15 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
         likeBtn.disabled = false;
       });
 
+      /* Compartir */
       const shareBtn = card.querySelector('.action-share');
       shareBtn.addEventListener('click', async () => {
         try {
           if (navigator.share) await navigator.share({ title: p.title, url: absoluteUrl });
-          else { await navigator.clipboard.writeText(absoluteUrl); shareBtn.title='Link copied!'; setTimeout(()=>shareBtn.title='Share',1200); }
+          else {
+            await navigator.clipboard.writeText(absoluteUrl);
+            shareBtn.title = 'Link copied!'; setTimeout(() => (shareBtn.title = 'Share'), 1200);
+          }
         } catch {}
       });
 
@@ -143,70 +153,32 @@ Welcome to my blog! Here I share short thoughts, deep dives, and technical explo
       cards.push({ slug, viewsEl, likesEl, viewsKey, likesKey });
     });
 
-    window.__cardsForSync = cards;
-  })();
-</script>
-
-<!-- Sincroniza métricas cuando el SDK esté listo + en foco + cada 30s -->
-<script>
-  (function () {
-    let syncing = false;
-    let lastSync = 0;
-    const MIN_GAP = 8000;   // no sincronizar más de 1 vez cada 8s
-    const POLL_MS = 30000;  // refresco periódico (ajústalo a tu gusto)
-
-    async function doSync() {
-      if (!window.__cardsForSync || syncing) return;
-      const now = Date.now();
-      if (now - lastSync < MIN_GAP) return;
-
-      // Obtén el cliente (ya cargado o cuando la promesa se resuelva)
-      const sb = window.__supabase || (window.__supabaseReady && await window.__supabaseReady);
-      if (!sb) return;
-
-      syncing = true;
+    /* Sincroniza métricas con Supabase cuando esté disponible */
+    (async () => {
       try {
-        const slugs = window.__cardsForSync.map(c => c.slug);
-        if (!slugs.length) return;
+        const sb = (window.__supabaseReady && typeof window.__supabaseReady.then === 'function')
+          ? await window.__supabaseReady
+          : null;
+        if (!sb) return;
 
+        const slugs = cards.map(c => c.slug);
         const { data, error } = await sb
           .from('post_metrics')
           .select('slug,views,likes')
           .in('slug', slugs);
+        if (error || !Array.isArray(data)) return;
 
-        if (!error && Array.isArray(data)) {
-          const map = new Map(data.map(r => [r.slug, r]));
-          for (const c of window.__cardsForSync) {
-            const m = map.get(c.slug);
-            if (m) {
-              c.viewsEl.textContent = m.views;
-              c.likesEl.textContent = m.likes;
-              localStorage.setItem(c.viewsKey, String(m.views));
-              localStorage.setItem(c.likesKey, String(m.likes));
-            }
+        const map = new Map(data.map(r => [r.slug, r]));
+        for (const c of cards) {
+          const m = map.get(c.slug);
+          if (m) {
+            c.viewsEl.textContent = m.views;
+            c.likesEl.textContent = m.likes;
+            setLocalCount(c.viewsKey, m.views);
+            setLocalCount(c.likesKey, m.likes);
           }
-          lastSync = Date.now();
         }
-      } catch (_) {
-        /* ignora errores de red */
-      } finally {
-        syncing = false;
-      }
-    }
-
-    // 1) Intenta sincronizar ahora mismo si se puede
-    doSync();
-
-    // 2) Cuando el loader emita el evento (SDK listo), sincroniza
-    document.addEventListener('supabase:ready', () => { doSync(); });
-
-    // 3) Al volver a la pestaña/ventana (mejora UX)
-    window.addEventListener('focus', () => { doSync(); });
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) doSync();
-    });
-
-    // 4) Polling suave cada 30s (cámbialo o elimina esta línea si no lo quieres)
-    setInterval(() => { doSync(); }, POLL_MS);
+      } catch {}
+    })();
   })();
 </script>
