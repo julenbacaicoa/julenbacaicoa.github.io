@@ -12,7 +12,39 @@ published: true
 
 ## 🧐 Overview
 
-> What if I told you that you don't need dozens of strain gauges and a forest of Wheatstone bridges to recover the full 6 load components, known technically as wrench, acting on a circular shaft? By measuring **individual quarter‑bridge gauges**, arranging them in carefully optimised locations and orientations, and solving a compact linear inverse problem, you can estimate the full wrench using **only 6 gauges** (or **8 gauges** if you also want in‑built temperature compensation). This post walks the math, the optimisation criterion, practical placements, calibration recipes and the lab validation. 
+> What if I told you that you don't need dozens of strain gauges and a forest of Wheatstone bridges to recover the full 6 load components, known technically as wrench, acting on a circular shaft? By measuring **individual quarter-bridge gauges**, arranging them in carefully optimised locations and orientations, and solving a compact linear inverse problem, you can estimate the full wrench using **only 6 gauges** (or **8 gauges** if you also want in-built temperature compensation). This post walks the math, the optimisation criterion, practical placements, calibration recipes and the lab validation. 
+
+---
+
+## 🔌 Wheatstone full-bridge vs. quarter-bridge — where does the “sum” happen?
+
+In **classical configurations** (Wheatstone **half-bridges** and **full-bridges**), the resistances of multiple gauges are **summed and subtracted electrically** inside the circuit itself. Thus, the **bridge output voltage** already comes “pre-combined” to be proportional to a **single load component** (e.g., axial, bending, or torsion). In a full-bridge, you also get **intrinsic temperature compensation** because two branches add and the other two subtract under the same temperature change. This is why such setups are so popular in traditional instrumentation.
+
+In our approach, each gauge is connected as a **quarter-bridge** and we measure **each signal individually**. The “sum/difference” happens **offline on the PC**: we linearly recombine those individual strains to reconstruct **all six components of the wrench**. This means that **one gauge can contribute to multiple estimates** (it’s not “locked” to a single component as in a dedicated bridge), and with the proper geometric design, we recover the **same sensitivity** as a conventional full-bridge.
+
+**Example (torsion and shear):**
+- With typical bridge setups you would need **two full-bridges** (8 gauges) and two channels:  
+  $$ M_1 \propto V^{\text{Tor}}_{\text{out}} \propto (\varepsilon_1 - \varepsilon_2 + \varepsilon_3 - \varepsilon_4) $$  
+  $$ F_3 \propto V^{\text{Shear}}_{\text{out}} \propto (\varepsilon_5 - \varepsilon_6 + \varepsilon_7 - \varepsilon_8) $$
+- With **individual quarter-bridges** (4 gauges for the torsion scheme), you measure $$V^{i}_{\text{out}}\propto \varepsilon_i$$ and **recombine them in software**:  
+  $$ M_1 \propto (V^{1}_{\text{out}} - V^{2}_{\text{out}} + V^{3}_{\text{out}} - V^{4}_{\text{out}}) \propto (\varepsilon_1 - \varepsilon_2 + \varepsilon_3 - \varepsilon_4) $$  
+  $$ F_3 \propto (V^{1}_{\text{out}} - V^{2}_{\text{out}} - V^{3}_{\text{out}} + V^{4}_{\text{out}}) \propto (\varepsilon_1 - \varepsilon_2 - \varepsilon_3 + \varepsilon_4) $$
+
+**Practical advantages of the “offline” approach:**
+- **Fewer dedicated bridges** and simpler wiring; each reading can be reused in multiple linear combinations.  
+- **Same sensitivity** as a full-bridge when recombined correctly (and two half-bridges are equivalent to a full in sensitivity).  
+- **Temperature:** the full-bridge compensates homogeneous drift “by design”; in our scheme, temperature is modeled as an **extra column of ones** and either **estimated** or **canceled by symmetry** (see 6- and 8-gauge layouts below). In the **6-gauge symmetric** setup it cancels for everything except axial force; with **8 gauges** you achieve full compensation with the $${60}^{\circ}/{90}^{\circ}$$ rosettes.
+
+<div style="display:flex; justify-content:center; gap:2rem; margin:1.25rem 0; flex-wrap:wrap;">
+  <div style="flex:1; min-width:260px; text-align:center; max-width:420px;">
+    <img src="/assets/images/blog/wheatstone_full_bridge.png" alt="Full/Half Wheatstone: sum/difference in hardware" style="width:100%; height:auto;">
+    <p style="font-style: italic; font-size: 0.9em; margin-top: 0.5rem;">Figure A — Full/Half Wheatstone: the combination happens in hardware (intrinsic thermal compensation in the full-bridge).</p>
+  </div>
+  <div style="flex:1; min-width:260px; text-align:center; max-width:420px;">
+    <img src="/assets/images/blog/wheatstone_quarter_bridge.png" alt="Quarter-bridges: offline recombination" style="width:100%; height:auto;">
+    <p style="font-style: italic; font-size: 0.9em; margin-top: 0.5rem;">Figure B — Quarter-bridges: each gauge is measured individually and recombined in software to estimate multiple load components from the same set.</p>
+  </div>
+</div>
 
 ---
 
@@ -24,7 +56,7 @@ Do you build rotating shafts, drivetrains, dynamometers or force sensors? Then y
 
 ## 🧠 Intuition — what's happening under the hood?
 
-Think of each strain gauge as a linear sensor that returns a number — the local axial strain in the direction of the gauge. That scalar is a linear combination of the six load components (three forces and three moments) acting on the cross‑section. So with $$n$$ gauges we write a linear system
+Think of each strain gauge as a linear sensor that returns a number — the local axial strain in the direction of the gauge. That scalar is a linear combination of the six load components (three forces and three moments) acting on the cross-section. So with $$n$$ gauges we write a linear system
 
 $$
 \boldsymbol{\varepsilon} = \mathbf{W}(\vartheta)\,\mathbf{t},
@@ -35,7 +67,7 @@ where:
 * $$\mathbf{t} = (F_1,F_2,F_3,M_1,M_2,M_3)^\top$$ is the wrench ($$p = 6$$),
 * $$\mathbf{W}(\boldsymbol{\vartheta})$$ is the $$n\times p$$ observation matrix built from the positions/orientations parameter vector $$\boldsymbol{\vartheta}$$ (angles $$\varphi_i,\delta_i$$). 
 
-If $$\mathbf{W}$$ has full rank ($$p = 6$$), we can invert (or pseudo‑invert) to get an estimator of the wrench from the measured strains — but the quality of that estimate depends *crucially* on the choice of gauge geometry (i.e., $$\mathbf{W}$$). So — where do we place the gauges to make $$\mathbf{W}$$ maximally informative? 
+If $$\mathbf{W}$$ has full rank ($$p = 6$$), we can invert (or pseudo-invert) to get an estimator of the wrench from the measured strains — but the quality of that estimate depends *crucially* on the choice of gauge geometry (i.e., $$\mathbf{W}$$). So — where do we place the gauges to make $$\mathbf{W}$$ maximally informative? 
 
 ---
 
@@ -47,7 +79,7 @@ If $$\mathbf{W}$$ has full rank ($$p = 6$$), we can invert (or pseudo‑invert) 
   </p>
 </div>
 
-Figure 1 is your road‑map: $$\varphi$$ locates the gauge around the circumference and $$\delta$$ defines the gauge axis relative to the local circumferential direction. Use that figure to follow the geometry below. 
+Figure 1 is your road-map: $$\varphi$$ locates the gauge around the circumference and $$\delta$$ defines the gauge axis relative to the local circumferential direction. Use that figure to follow the geometry below. 
 
 ---
 
@@ -63,7 +95,7 @@ $$
 
 the complete explicit row vector $$\mathbf{w}(\varphi,\delta)$$ encodes the contributions of axial force, shear, torsion and bending to the axial strain at the gauge location. 
 
-### Multi‑gauge observation model
+### Multi-gauge observation model
 
 Stacking the $$n$$ gauge measurements:
 
@@ -81,7 +113,7 @@ where $$\mathbf{e}$$ is the measurement error (noise + bias contributions).
 
 ### The estimator (Weighted Least Squares-WLS / Maximum Likelihood-ML)
 
-Assuming zero‑mean errors and known covariance $$\boldsymbol{\Sigma} = E[\mathbf{e}\mathbf{e}^\top]$$, the minimum‑variance linear estimator is the weighted least‑squares (equivalently ML under Gaussian noise):
+Assuming zero-mean errors and known covariance $$\boldsymbol{\Sigma} = E[\mathbf{e}\mathbf{e}^\top]$$, the minimum-variance linear estimator is the weighted least-squares (equivalently ML under Gaussian noise):
 
 $$
 \hat{\mathbf{t}} = (\mathbf{W}^\top \boldsymbol{\Sigma}^{-1} {\mathbf{W}})^{-1}{\mathbf{W}}^\top\boldsymbol{\Sigma}^{-1}\,\boldsymbol{\varepsilon}_m
@@ -99,19 +131,19 @@ $$
 \operatorname{var}(\hat{\mathbf{t}}) = \operatorname{var}(\varepsilon_m)\,(\mathbf{W}^\top \mathbf{W})^{-1}
 $$
 
-These are the operational formulas: compute $$\mathbf{W}$$ from the design, then compute the inverse once offline; real‑time estimation is a single matrix–vector product. 
+These are the operational formulas: compute $$\mathbf{W}$$ from the design, then compute the inverse once offline; real-time estimation is a single matrix–vector product. 
 
 ---
 
-## How to *choose* the positions and orientations? — D‑optimality
+## How to *choose* the positions and orientations? — D-optimality
 
-We want a configuration $$\boldsymbol{\vartheta}$$ that makes the estimate as precise as possible. The paper adopts the D‑optimality criterion: maximise information (minimise volume of the estimate covariance ellipsoid) by minimising
+We want a configuration $$\boldsymbol{\vartheta}$$ that makes the estimate as precise as possible. The paper adopts the D-optimality criterion: maximise information (minimise volume of the estimate covariance ellipsoid) by minimising
 
 $$
 \mathcal{F}(\mathbf{W}) = -\log\det(\mathbf{W}^\top \mathbf{W})
 $$
 
-D‑optimality is scale‑invariant (so forces and moments with different units don't skew the result) and well suited to sensor placement problems. The optimisation problem is
+D-optimality is scale-invariant (so forces and moments with different units don't skew the result) and well suited to sensor placement problems. The optimisation problem is
 
 $$
 \boldsymbol{\vartheta}_{\text{opt}} = \arg\min_{\boldsymbol{\vartheta}} \mathcal{F}(\mathbf{W}(\boldsymbol{\vartheta})), \quad \text{subject to} \quad \mathbf{c}(\boldsymbol{\vartheta})=\mathbf{0}
@@ -121,7 +153,7 @@ This is the core design step: pick $$n\ge p$$ gauges, define their $$\varphi_i,\
 
 ---
 
-## Attractive analytic family: the six‑gauge symmetric solution
+## Attractive analytic family: the six-gauge symmetric solution
 
 Running the optimization the solutions show a simple, symmetric structure. One family that emerges (and that is very convenient to build) is:
 
@@ -138,13 +170,13 @@ $$
 \alpha_{\mathrm{opt}} \approx 26.8^\circ \quad(\text{example for }\nu = 1/3)
 $$
 
-This compact family is both practically convenient and near‑optimal. 
+This compact family is both practically convenient and near-optimal. 
 
 ---
 
 ## What about temperature effects?
 
-Thermal (apparent) strain is ever‑present. The work models an additive homogeneous apparent strain $$\varepsilon_T$$ (same for all gauges), and extends the linear system as:
+Thermal (apparent) strain is ever-present. The work models an additive homogeneous apparent strain $$\varepsilon_T$$ (same for all gauges), and extends the linear system as:
 
 $$
 \boldsymbol{\varepsilon}_m = \big[\,\mathbf{W}\ \ \mathbf{1}\,\big]
@@ -153,7 +185,7 @@ $$
 
 so temperature can be treated as an extra parameter ($$p \Rightarrow p+1$$). With this viewpoint you can either:
 * design $$\boldsymbol{\vartheta}$$ so the extra column is (approximately) orthogonal to the span of the mechanical columns (so $$\varepsilon_T$$ is identifiable), or
-* choose symmetric configurations that *intrinsically cancel* the temperature term for the torque/bending components (the paper shows the 6‑gauge family cancels temperature for all components except axial force). 
+* choose symmetric configurations that *intrinsically cancel* the temperature term for the torque/bending components (the paper shows the 6-gauge family cancels temperature for all components except axial force). 
 
 With 8 gauges (two rosettes of 4 gauges), the paper gives symmetric configurations that fully compensate the apparent thermal strain for all mechanical components (i.e., $$p = 7$$ system with temperature included). Two practical solutions for 8 gauges are provided below — one corresponds to a $$60^\circ$$ rosette variant, the other to a $$90^\circ$$ rosette—both are symmetric and friendly for manufacturing.
 
@@ -242,7 +274,7 @@ These expressions expose the trade-off: a single $$\alpha$$ cannot simultaneousl
 
 ## 🛠️ Practical calibration recipe (from the lab section)
 
-The experimental section describes a careful calibration procedure for an 8‑gauge configuration. The paper recommends the following steps (condensed):
+The experimental section describes a careful calibration procedure for an 8-gauge configuration. The paper recommends the following steps (condensed):
 
 **1️⃣ Fit a sinusoid to each measured gauge signal**  
 For each gauge $$i=1,\dots,n$$ fit the linear model over a full rotation:
@@ -308,6 +340,7 @@ $$
 $$
 
 The full procedure is repeatable; follow it closely if you plan a precise calibration. Next, you can find an example of the calibration procedure code on $$\mathtt{Python}$$:
+
 
 {: .code-title}
 Strain gauges calibration — Python
